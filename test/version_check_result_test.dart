@@ -7,23 +7,22 @@ VersionCheckResponse response({
   String? recommended,
   bool forceUpdate = true,
   bool enabled = true,
-}) =>
-    VersionCheckResponse(
-      schemaVersion: 1,
-      appId: 'com.example.app',
-      platform: 'android',
-      channel: VersionChannel.production,
-      latest: VersionInfo.parse(latest),
-      minimum: VersionInfo.parse(minimum),
-      recommended: recommended == null ? null : VersionInfo.parse(recommended),
-      policy: VersionPolicy(
-        mode: PolicyMode.custom,
-        forceUpdate: forceUpdate,
-        enabled: enabled,
-        updateMessage: 'Update please',
-      ),
-      updateUrl: 'https://example.com/update',
-    );
+}) => VersionCheckResponse(
+  schemaVersion: 1,
+  appId: 'com.example.app',
+  platform: 'android',
+  channel: VersionChannel.production,
+  latest: VersionInfo.parse(latest),
+  minimum: VersionInfo.parse(minimum),
+  recommended: recommended == null ? null : VersionInfo.parse(recommended),
+  policy: VersionPolicy(
+    mode: PolicyMode.custom,
+    forceUpdate: forceUpdate,
+    enabled: enabled,
+    updateMessage: 'Update please',
+  ),
+  updateUrl: 'https://example.com/update',
+);
 
 VersionCheckResult evaluate(String current, VersionCheckResponse r) =>
     VersionCheckResult.evaluate(
@@ -69,7 +68,11 @@ void main() {
     });
 
     test('force_update=false never blocks', () {
-      final soft = response(latest: '2.7.0', minimum: '2.5.0', forceUpdate: false);
+      final soft = response(
+        latest: '2.7.0',
+        minimum: '2.5.0',
+        forceUpdate: false,
+      );
       final r = evaluate('2.4.0', soft);
       expect(r.status, UpdateStatus.updateAvailable);
       expect(r.isBelowMinimum, isTrue);
@@ -100,7 +103,10 @@ void main() {
           channel: VersionChannel.production,
           latest: VersionInfo.parse('2.7.0', build: 270),
           minimum: VersionInfo.parse('2.7.0', build: 270),
-          policy: const VersionPolicy(mode: PolicyMode.autoLatest, forceUpdate: true),
+          policy: const VersionPolicy(
+            mode: PolicyMode.autoLatest,
+            forceUpdate: true,
+          ),
         ),
         source: CheckSource.network,
         checkedAt: DateTime.utc(2026),
@@ -132,7 +138,10 @@ void main() {
     });
 
     test('toJson includes the decision flags', () {
-      final json = evaluate('2.4.0', response(latest: '2.7.0', minimum: '2.5.0')).toJson();
+      final json = evaluate(
+        '2.4.0',
+        response(latest: '2.7.0', minimum: '2.5.0'),
+      ).toJson();
       expect(json['status'], 'updateRequired');
       expect(json['is_blocked'], isTrue);
       expect(json['latest'], {'version': '2.7.0'});

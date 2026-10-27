@@ -73,7 +73,10 @@ class _UpdateAvailablePromptState extends State<UpdateAvailablePrompt>
       onSkip: widget.onSkip,
       centered: true,
     );
-    final curve = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    final curve = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
 
     switch (s.presentation) {
       case UpgraderPresentation.fullScreen:
@@ -97,7 +100,12 @@ class _UpdateAvailablePromptState extends State<UpdateAvailablePrompt>
       case UpgraderPresentation.dialog:
         return Stack(
           children: [
-            _Barrier(color: s.barrier, animation: curve, onTap: widget.onLater, blur: s.blurBackdrop),
+            _Barrier(
+              color: s.barrier,
+              animation: curve,
+              onTap: widget.onLater,
+              blur: s.blurBackdrop,
+            ),
             Center(
               child: FadeTransition(
                 opacity: curve,
@@ -122,14 +130,24 @@ class _UpdateAvailablePromptState extends State<UpdateAvailablePrompt>
       case UpgraderPresentation.bottomSheet:
         return Stack(
           children: [
-            _Barrier(color: s.barrier, animation: curve, onTap: widget.onLater, blur: s.blurBackdrop),
+            _Barrier(
+              color: s.barrier,
+              animation: curve,
+              onTap: widget.onLater,
+              blur: s.blurBackdrop,
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: SlideTransition(
-                position: Tween(begin: const Offset(0, 1), end: Offset.zero).animate(curve),
+                position: Tween(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(curve),
                 child: _GlowSurface(
                   style: s,
-                  borderRadius: BorderRadius.vertical(top: s.borderRadius.topLeft),
+                  borderRadius: BorderRadius.vertical(
+                    top: s.borderRadius.topLeft,
+                  ),
                   child: SafeArea(
                     top: false,
                     child: ConstrainedBox(
@@ -168,7 +186,12 @@ class _UpdateAvailablePromptState extends State<UpdateAvailablePrompt>
 }
 
 class _Barrier extends StatelessWidget {
-  const _Barrier({required this.color, required this.animation, required this.onTap, this.blur = true});
+  const _Barrier({
+    required this.color,
+    required this.animation,
+    required this.onTap,
+    this.blur = true,
+  });
 
   final Color color;
   final Animation<double> animation;
@@ -195,7 +218,11 @@ class _Barrier extends StatelessWidget {
 
 /// Surface with a soft accent glow bleeding in from the top edge.
 class _GlowSurface extends StatelessWidget {
-  const _GlowSurface({required this.style, required this.borderRadius, required this.child});
+  const _GlowSurface({
+    required this.style,
+    required this.borderRadius,
+    required this.child,
+  });
 
   final ResolvedUpgraderStyle style;
   final BorderRadius borderRadius;

@@ -68,10 +68,12 @@ class UpdateRequiredScreen extends StatelessWidget {
                     texts: failed
                         ? texts.copyWith(updateButton: 'Retry', versionLine: '')
                         : texts,
-                    title: failed ? 'Unable to verify version' : texts.requiredTitle,
+                    title: failed
+                        ? 'Unable to verify version'
+                        : texts.requiredTitle,
                     message: failed
                         ? 'The version service could not be reached. '
-                            'Please check your connection and try again.'
+                              'Please check your connection and try again.'
                         : texts.resolveRequiredMessage(result),
                     onUpdate: failed ? (onRetry ?? onUpdate) : onUpdate,
                   ),

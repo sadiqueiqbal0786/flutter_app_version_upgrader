@@ -35,8 +35,8 @@ class VersionApiException implements Exception {
 class VersionApiClient {
   /// Creates a [VersionApiClient].
   VersionApiClient({required this.config, http.Client? httpClient})
-      : _http = httpClient ?? http.Client(),
-        _ownsClient = httpClient == null;
+    : _http = httpClient ?? http.Client(),
+      _ownsClient = httpClient == null;
 
   /// The configuration in effect.
   final VersionManagerConfig config;

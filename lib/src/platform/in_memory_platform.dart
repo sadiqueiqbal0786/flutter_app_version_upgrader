@@ -56,6 +56,5 @@ class InMemoryFlutterAppVersionUpgraderPlatform
     String? url,
     String? packageName,
     String? appStoreId,
-  }) async =>
-      false;
+  }) async => false;
 }

@@ -10,9 +10,8 @@ import 'package:flutter_app_version_upgrader/ui.dart';
 /// Run `dart run tool/mock_version_server.dart` from the `example/`
 /// directory to get a local backend. The Android emulator reaches the host
 /// machine at 10.0.2.2; the iOS simulator uses localhost.
-String get defaultBaseUrl => Platform.isAndroid
-    ? 'http://10.0.2.2:8080'
-    : 'http://localhost:8080';
+String get defaultBaseUrl =>
+    Platform.isAndroid ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +44,9 @@ class ExampleApp extends StatelessWidget {
       // a bottom sheet with Update / Later / Skip for optional ones. Swap
       // `style`, `texts` or the builders to make it your own; see README.
       builder: (context, child) => VersionUpgrader(
-        style: const UpgraderStyle(presentation: UpgraderPresentation.bottomSheet),
+        style: const UpgraderStyle(
+          presentation: UpgraderPresentation.bottomSheet,
+        ),
         texts: const UpgraderTexts(availableTitle: 'New version available'),
         child: child!,
       ),
@@ -104,7 +105,10 @@ class _HomePageState extends State<HomePage> {
             _StatusBanner(result: result),
             const SizedBox(height: 16),
             _Row('Status', result.status.name),
-            _Row('Source', '${result.source.name}${result.isStale ? ' (stale)' : ''}'),
+            _Row(
+              'Source',
+              '${result.source.name}${result.isStale ? ' (stale)' : ''}',
+            ),
             _Row('Installed', '${result.current}'),
             _Row('Latest', '${result.latest ?? '-'}'),
             _Row('Minimum', '${result.minimum ?? '-'}'),
@@ -158,13 +162,26 @@ class _StatusBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final (icon, label, color) = switch (result.status) {
-      UpdateStatus.upToDate => (Icons.check_circle, 'Up to date', scheme.primary),
-      UpdateStatus.updateAvailable =>
-        (Icons.new_releases, 'Update available', scheme.tertiary),
-      UpdateStatus.updateRequired =>
-        (Icons.error, 'Update required', scheme.error),
-      UpdateStatus.checkFailed =>
-        (Icons.cloud_off, 'Check failed', scheme.outline),
+      UpdateStatus.upToDate => (
+        Icons.check_circle,
+        'Up to date',
+        scheme.primary,
+      ),
+      UpdateStatus.updateAvailable => (
+        Icons.new_releases,
+        'Update available',
+        scheme.tertiary,
+      ),
+      UpdateStatus.updateRequired => (
+        Icons.error,
+        'Update required',
+        scheme.error,
+      ),
+      UpdateStatus.checkFailed => (
+        Icons.cloud_off,
+        'Check failed',
+        scheme.outline,
+      ),
     };
     return Card(
       child: ListTile(
@@ -189,7 +206,13 @@ class _Row extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 110, child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600))),
+          SizedBox(
+            width: 110,
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
           Expanded(child: SelectableText(value)),
         ],
       ),

@@ -11,11 +11,7 @@ class StoreLauncher {
   /// [packageName] (Android) or [appStoreId] (iOS).
   ///
   /// Returns `true` if a store or browser was launched.
-  Future<bool> open({
-    String? url,
-    String? packageName,
-    String? appStoreId,
-  }) =>
+  Future<bool> open({String? url, String? packageName, String? appStoreId}) =>
       _platform.openStore(
         url: url,
         packageName: packageName,

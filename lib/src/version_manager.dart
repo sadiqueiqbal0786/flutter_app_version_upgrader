@@ -54,9 +54,10 @@ class VersionManager {
     http.Client? httpClient,
     VersionApiClient? apiClient,
     DateTime Function()? clock,
-  })  : _platform = platform ?? _defaultPlatform(),
-        _clock = clock ?? _utcNow {
-    _api = apiClient ?? VersionApiClient(config: config, httpClient: httpClient);
+  }) : _platform = platform ?? _defaultPlatform(),
+       _clock = clock ?? _utcNow {
+    _api =
+        apiClient ?? VersionApiClient(config: config, httpClient: httpClient);
     _cache = PolicyCacheService(_platform);
     _store = StoreLauncher(_platform);
   }
@@ -74,8 +75,8 @@ class VersionManager {
 
   static FlutterAppVersionUpgraderPlatform _defaultPlatform() =>
       isPlatformSupported
-          ? FlutterAppVersionUpgraderPlatform.instance
-          : InMemoryFlutterAppVersionUpgraderPlatform();
+      ? FlutterAppVersionUpgraderPlatform.instance
+      : InMemoryFlutterAppVersionUpgraderPlatform();
 
   /// The configuration in effect.
   final VersionManagerConfig config;

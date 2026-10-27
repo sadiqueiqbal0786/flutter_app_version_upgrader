@@ -28,11 +28,21 @@ void main() {
     });
 
     test('rejects garbage', () {
-      for (final bad in ['', 'abc', '1.2.3.4', '1..2', '1.2.3-', '1.2.3+', '-1']) {
+      for (final bad in [
+        '',
+        'abc',
+        '1.2.3.4',
+        '1..2',
+        '1.2.3-',
+        '1.2.3+',
+        '-1',
+      ]) {
         expect(SemanticVersion.tryParse(bad), isNull, reason: bad);
       }
-      expect(() => SemanticVersion.parse('x'),
-          throwsA(isA<VersionFormatException>()));
+      expect(
+        () => SemanticVersion.parse('x'),
+        throwsA(isA<VersionFormatException>()),
+      );
     });
   });
 
@@ -42,8 +52,11 @@ void main() {
     test('compares numerically, not lexically', () {
       expect(v('2.10.0') > v('2.9.0'), isTrue);
       expect(v('10.0.0') > v('9.9.9'), isTrue);
-      expect('2.10.0'.compareTo('2.9.0') < 0, isTrue,
-          reason: 'string comparison is wrong, which is why we parse');
+      expect(
+        '2.10.0'.compareTo('2.9.0') < 0,
+        isTrue,
+        reason: 'string comparison is wrong, which is why we parse',
+      );
     });
 
     test('pre-release is lower than the release', () {
@@ -63,8 +76,11 @@ void main() {
         '1.0.0',
       ];
       for (var i = 0; i < ordered.length - 1; i++) {
-        expect(v(ordered[i]) < v(ordered[i + 1]), isTrue,
-            reason: '${ordered[i]} < ${ordered[i + 1]}');
+        expect(
+          v(ordered[i]) < v(ordered[i + 1]),
+          isTrue,
+          reason: '${ordered[i]} < ${ordered[i + 1]}',
+        );
       }
     });
 

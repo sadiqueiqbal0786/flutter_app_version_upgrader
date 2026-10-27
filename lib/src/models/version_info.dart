@@ -46,9 +46,9 @@ class VersionInfo implements Comparable<VersionInfo> {
 
   /// Serialises to the wire format used by the version API.
   Map<String, dynamic> toJson() => {
-        'version': version.toString(),
-        if (build != null) 'build': build,
-      };
+    'version': version.toString(),
+    if (build != null) 'build': build,
+  };
 
   @override
   int compareTo(VersionInfo other) {
@@ -67,7 +67,8 @@ class VersionInfo implements Comparable<VersionInfo> {
   bool operator >=(VersionInfo other) => compareTo(other) >= 0;
 
   @override
-  bool operator ==(Object other) => other is VersionInfo && compareTo(other) == 0;
+  bool operator ==(Object other) =>
+      other is VersionInfo && compareTo(other) == 0;
 
   @override
   int get hashCode => Object.hash(version, build);

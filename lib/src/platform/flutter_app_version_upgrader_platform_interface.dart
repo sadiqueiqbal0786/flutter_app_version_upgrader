@@ -53,7 +53,11 @@ abstract class FlutterAppVersionUpgraderPlatform extends PlatformInterface {
   /// deep link using [packageName] (Android) or [appStoreId] (iOS).
   ///
   /// Returns `true` if something was launched.
-  Future<bool> openStore({String? url, String? packageName, String? appStoreId}) {
+  Future<bool> openStore({
+    String? url,
+    String? packageName,
+    String? appStoreId,
+  }) {
     throw UnimplementedError('openStore() has not been implemented.');
   }
 }

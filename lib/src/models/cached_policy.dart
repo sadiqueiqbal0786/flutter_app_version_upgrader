@@ -26,8 +26,9 @@ class CachedPolicy {
       final expires = DateTime.tryParse(json['expires_at'] as String? ?? '');
       if (body is! Map || received == null || expires == null) return null;
       return CachedPolicy(
-        response:
-            VersionCheckResponse.fromJson(Map<String, dynamic>.from(body)),
+        response: VersionCheckResponse.fromJson(
+          Map<String, dynamic>.from(body),
+        ),
         receivedAt: received.toUtc(),
         expiresAt: expires.toUtc(),
       );
@@ -50,9 +51,9 @@ class CachedPolicy {
 
   /// Serialises the envelope.
   Map<String, dynamic> toJson() => {
-        'cache_version': 1,
-        'response': response.toJson(),
-        'received_at': receivedAt.toUtc().toIso8601String(),
-        'expires_at': expiresAt.toUtc().toIso8601String(),
-      };
+    'cache_version': 1,
+    'response': response.toJson(),
+    'received_at': receivedAt.toUtc().toIso8601String(),
+    'expires_at': expiresAt.toUtc().toIso8601String(),
+  };
 }

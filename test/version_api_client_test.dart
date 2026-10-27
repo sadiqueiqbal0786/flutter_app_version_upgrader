@@ -61,8 +61,13 @@ void main() {
           channel: VersionChannel.production,
           current: current,
         ),
-        throwsA(isA<VersionApiException>()
-            .having((e) => e.statusCode, 'statusCode', 503)),
+        throwsA(
+          isA<VersionApiException>().having(
+            (e) => e.statusCode,
+            'statusCode',
+            503,
+          ),
+        ),
       );
     });
 
@@ -103,9 +108,13 @@ void main() {
         config: config.copyWith(
           responseValidator: (body, headers) => headers['x-signature'] == 'ok',
         ),
-        httpClient: MockClient((_) async =>
-            http.Response(jsonEncode(sampleBody()), 200,
-                headers: {'x-signature': 'bad'})),
+        httpClient: MockClient(
+          (_) async => http.Response(
+            jsonEncode(sampleBody()),
+            200,
+            headers: {'x-signature': 'bad'},
+          ),
+        ),
       );
       expect(
         () => client.fetch(
@@ -133,8 +142,13 @@ void main() {
           channel: VersionChannel.production,
           current: current,
         ),
-        throwsA(isA<VersionApiException>()
-            .having((e) => e.message, 'message', contains('timed out'))),
+        throwsA(
+          isA<VersionApiException>().having(
+            (e) => e.message,
+            'message',
+            contains('timed out'),
+          ),
+        ),
       );
     });
   });

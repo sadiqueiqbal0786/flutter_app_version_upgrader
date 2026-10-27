@@ -79,12 +79,19 @@ class _UpgraderContentState extends State<UpgraderContent>
     final start = (index * 0.08).clamp(0.0, 0.6);
     final anim = CurvedAnimation(
       parent: _enter,
-      curve: Interval(start, (start + 0.5).clamp(0.0, 1.0), curve: Curves.easeOutCubic),
+      curve: Interval(
+        start,
+        (start + 0.5).clamp(0.0, 1.0),
+        curve: Curves.easeOutCubic,
+      ),
     );
     return FadeTransition(
       opacity: anim,
       child: SlideTransition(
-        position: Tween(begin: const Offset(0, 0.12), end: Offset.zero).animate(anim),
+        position: Tween(
+          begin: const Offset(0, 0.12),
+          end: Offset.zero,
+        ).animate(anim),
         child: child,
       ),
     );
@@ -95,68 +102,115 @@ class _UpgraderContentState extends State<UpgraderContent>
     final s = widget.style;
     final t = widget.texts;
     final r = widget.result;
-    final align = widget.centered ? CrossAxisAlignment.center : CrossAxisAlignment.start;
+    final align = widget.centered
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
     final textAlign = widget.centered ? TextAlign.center : TextAlign.start;
     final notes = r.releaseNotes;
-    final versionLine = t.versionLine.isEmpty ? null : UpgraderTexts.fill(t.versionLine, r);
+    final versionLine = t.versionLine.isEmpty
+        ? null
+        : UpgraderTexts.fill(t.versionLine, r);
     var i = 0;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: align,
       children: [
-        _staggered(i++, Align(
-          alignment: widget.centered ? Alignment.center : Alignment.centerLeft,
-          child: s.illustration ?? UpgraderHero(style: s, scale: widget.heroScale),
-        )),
+        _staggered(
+          i++,
+          Align(
+            alignment: widget.centered
+                ? Alignment.center
+                : Alignment.centerLeft,
+            child:
+                s.illustration ??
+                UpgraderHero(style: s, scale: widget.heroScale),
+          ),
+        ),
         SizedBox(height: 22 * widget.heroScale),
-        _staggered(i++, Text(widget.title, style: s.title, textAlign: textAlign)),
+        _staggered(
+          i++,
+          Text(widget.title, style: s.title, textAlign: textAlign),
+        ),
         const SizedBox(height: 10),
-        _staggered(i++, Text(widget.message, style: s.message, textAlign: textAlign)),
+        _staggered(
+          i++,
+          Text(widget.message, style: s.message, textAlign: textAlign),
+        ),
         if (s.showVersionChips && r.latest != null) ...[
           const SizedBox(height: 18),
-          _staggered(i++, Align(
-            alignment: widget.centered ? Alignment.center : Alignment.centerLeft,
-            // Long version strings or large fonts shrink instead of overflowing.
-            child: FittedBox(fit: BoxFit.scaleDown, child: VersionChips(result: r, style: s)),
-          )),
+          _staggered(
+            i++,
+            Align(
+              alignment: widget.centered
+                  ? Alignment.center
+                  : Alignment.centerLeft,
+              // Long version strings or large fonts shrink instead of overflowing.
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: VersionChips(result: r, style: s),
+              ),
+            ),
+          ),
         ],
         if (versionLine != null) ...[
           const SizedBox(height: 10),
-          _staggered(i++, Text(versionLine, style: s.caption, textAlign: textAlign)),
+          _staggered(
+            i++,
+            Text(versionLine, style: s.caption, textAlign: textAlign),
+          ),
         ],
         if (notes != null && notes.trim().isNotEmpty) ...[
           const SizedBox(height: 18),
-          _staggered(i++, ReleaseNotesCard(
-            title: t.releaseNotesTitle,
-            notes: notes.trim(),
-            style: s,
-            maxLines: widget.releaseNotesMaxLines,
-          )),
+          _staggered(
+            i++,
+            ReleaseNotesCard(
+              title: t.releaseNotesTitle,
+              notes: notes.trim(),
+              style: s,
+              maxLines: widget.releaseNotesMaxLines,
+            ),
+          ),
         ],
         const SizedBox(height: 28),
-        _staggered(i++, UpgraderPrimaryButton(
-          label: t.updateButton,
-          style: s,
-          onPressed: widget.onUpdate,
-        )),
+        _staggered(
+          i++,
+          UpgraderPrimaryButton(
+            label: t.updateButton,
+            style: s,
+            onPressed: widget.onUpdate,
+          ),
+        ),
         if (widget.onLater != null || widget.onSkip != null) ...[
           const SizedBox(height: 8),
-          _staggered(i++, Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              if (widget.onLater != null && t.laterButton.isNotEmpty)
-                _SecondaryButton(label: t.laterButton, style: s, onPressed: widget.onLater!),
-              if (widget.onLater != null && t.laterButton.isNotEmpty && widget.onSkip != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Text('·', style: s.caption),
-                ),
-              if (widget.onSkip != null)
-                _SecondaryButton(label: t.skipButton, style: s, onPressed: widget.onSkip!),
-            ],
-          )),
+          _staggered(
+            i++,
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (widget.onLater != null && t.laterButton.isNotEmpty)
+                  _SecondaryButton(
+                    label: t.laterButton,
+                    style: s,
+                    onPressed: widget.onLater!,
+                  ),
+                if (widget.onLater != null &&
+                    t.laterButton.isNotEmpty &&
+                    widget.onSkip != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('·', style: s.caption),
+                  ),
+                if (widget.onSkip != null)
+                  _SecondaryButton(
+                    label: t.skipButton,
+                    style: s,
+                    onPressed: widget.onSkip!,
+                  ),
+              ],
+            ),
+          ),
         ],
       ],
     );
@@ -216,8 +270,14 @@ class _UpgraderHeroState extends State<UpgraderHero>
           return Stack(
             alignment: Alignment.center,
             children: [
-              _ring(disc * (1.35 + 0.5 * v), accent.withValues(alpha: 0.10 * (1 - v))),
-              _ring(disc * (1.2 + 0.25 * v), accent.withValues(alpha: 0.14 * (1 - v * 0.6))),
+              _ring(
+                disc * (1.35 + 0.5 * v),
+                accent.withValues(alpha: 0.10 * (1 - v)),
+              ),
+              _ring(
+                disc * (1.2 + 0.25 * v),
+                accent.withValues(alpha: 0.14 * (1 - v * 0.6)),
+              ),
               _ring(disc * 1.22, accent.withValues(alpha: 0.10)),
               child!,
             ],
@@ -248,10 +308,10 @@ class _UpgraderHeroState extends State<UpgraderHero>
   }
 
   Widget _ring(double size, Color color) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      );
+    width: size,
+    height: size,
+    decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+  );
 }
 
 /// "installed → latest" chips.
@@ -271,33 +331,52 @@ class VersionChips extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _chip(result.current.toString(), bg: s.muted.withValues(alpha: 0.12), fg: s.muted),
+        _chip(
+          result.current.toString(),
+          bg: s.muted.withValues(alpha: 0.12),
+          fg: s.muted,
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Icon(
-            s.cupertino ? CupertinoIcons.arrow_right : Icons.arrow_forward_rounded,
+            s.cupertino
+                ? CupertinoIcons.arrow_right
+                : Icons.arrow_forward_rounded,
             size: 16,
             color: s.muted,
           ),
         ),
-        _chip(result.latest.toString(), bg: s.accent.withValues(alpha: s.isDark ? 0.22 : 0.12), fg: s.accent, bold: true),
+        _chip(
+          result.latest.toString(),
+          bg: s.accent.withValues(alpha: s.isDark ? 0.22 : 0.12),
+          fg: s.accent,
+          bold: true,
+        ),
       ],
     );
   }
 
-  Widget _chip(String text, {required Color bg, required Color fg, bool bold = false}) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(100)),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: fg,
-            fontSize: 13,
-            fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-            fontFeatures: const [FontFeature.tabularFigures()],
-          ),
-        ),
-      );
+  Widget _chip(
+    String text, {
+    required Color bg,
+    required Color fg,
+    bool bold = false,
+  }) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    decoration: BoxDecoration(
+      color: bg,
+      borderRadius: BorderRadius.circular(100),
+    ),
+    child: Text(
+      text,
+      style: TextStyle(
+        color: fg,
+        fontSize: 13,
+        fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+    ),
+  );
 }
 
 /// Release notes in a soft card.
@@ -341,9 +420,21 @@ class ReleaseNotesCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(s.cupertino ? CupertinoIcons.sparkles : Icons.auto_awesome_rounded, size: 16, color: s.accent),
+              Icon(
+                s.cupertino
+                    ? CupertinoIcons.sparkles
+                    : Icons.auto_awesome_rounded,
+                size: 16,
+                color: s.accent,
+              ),
               const SizedBox(width: 8),
-              Text(title, style: s.caption?.copyWith(fontWeight: FontWeight.w700, color: s.foreground)),
+              Text(
+                title,
+                style: s.caption?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: s.foreground,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -420,11 +511,18 @@ class _UpgraderPrimaryButtonState extends State<UpgraderPrimaryButton> {
               children: [
                 Text(
                   widget.label,
-                  style: TextStyle(color: s.onAccent, fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.2),
+                  style: TextStyle(
+                    color: s.onAccent,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Icon(
-                  s.cupertino ? CupertinoIcons.arrow_right : Icons.arrow_forward_rounded,
+                  s.cupertino
+                      ? CupertinoIcons.arrow_right
+                      : Icons.arrow_forward_rounded,
                   size: 18,
                   color: s.onAccent,
                 ),
@@ -438,7 +536,11 @@ class _UpgraderPrimaryButtonState extends State<UpgraderPrimaryButton> {
 }
 
 class _SecondaryButton extends StatelessWidget {
-  const _SecondaryButton({required this.label, required this.style, required this.onPressed});
+  const _SecondaryButton({
+    required this.label,
+    required this.style,
+    required this.onPressed,
+  });
 
   final String label;
   final ResolvedUpgraderStyle style;
@@ -446,7 +548,14 @@ class _SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Text(label, style: TextStyle(color: style.muted, fontWeight: FontWeight.w600, fontSize: 14));
+    final text = Text(
+      label,
+      style: TextStyle(
+        color: style.muted,
+        fontWeight: FontWeight.w600,
+        fontSize: 14,
+      ),
+    );
     if (style.cupertino) {
       return CupertinoButton(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

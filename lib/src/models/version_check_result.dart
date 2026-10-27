@@ -62,18 +62,18 @@ class VersionCheckResult {
     required this.checkedAt,
     required bool blockWhenUnknown,
     this.error,
-  })  : status = UpdateStatus.checkFailed,
-        source = CheckSource.none,
-        latest = null,
-        minimum = null,
-        recommended = null,
-        policy = null,
-        updateUrl = null,
-        updateMessage = null,
-        releaseNotes = null,
-        isStale = false,
-        // ignore: prefer_initializing_formals
-        _blockWhenUnknown = blockWhenUnknown;
+  }) : status = UpdateStatus.checkFailed,
+       source = CheckSource.none,
+       latest = null,
+       minimum = null,
+       recommended = null,
+       policy = null,
+       updateUrl = null,
+       updateMessage = null,
+       releaseNotes = null,
+       isStale = false,
+       // ignore: prefer_initializing_formals
+       _blockWhenUnknown = blockWhenUnknown;
 
   /// Builds a result by comparing [current] against [response].
   ///
@@ -197,23 +197,23 @@ class VersionCheckResult {
 
   /// A debug-friendly map of this result.
   Map<String, dynamic> toJson() => {
-        'status': status.name,
-        'source': source.name,
-        'current': current.toJson(),
-        if (latest != null) 'latest': latest!.toJson(),
-        if (minimum != null) 'minimum': minimum!.toJson(),
-        if (recommended != null) 'recommended': recommended!.toJson(),
-        if (policy != null) 'policy': policy!.toJson(),
-        if (updateUrl != null) 'update_url': updateUrl,
-        if (updateMessage != null) 'update_message': updateMessage,
-        if (releaseNotes != null) 'release_notes': releaseNotes,
-        'is_update_available': isUpdateAvailable,
-        'is_update_required': isUpdateRequired,
-        'is_blocked': isBlocked,
-        'is_stale': isStale,
-        'checked_at': checkedAt.toUtc().toIso8601String(),
-        if (error != null) 'error': error.toString(),
-      };
+    'status': status.name,
+    'source': source.name,
+    'current': current.toJson(),
+    if (latest != null) 'latest': latest!.toJson(),
+    if (minimum != null) 'minimum': minimum!.toJson(),
+    if (recommended != null) 'recommended': recommended!.toJson(),
+    if (policy != null) 'policy': policy!.toJson(),
+    if (updateUrl != null) 'update_url': updateUrl,
+    if (updateMessage != null) 'update_message': updateMessage,
+    if (releaseNotes != null) 'release_notes': releaseNotes,
+    'is_update_available': isUpdateAvailable,
+    'is_update_required': isUpdateRequired,
+    'is_blocked': isBlocked,
+    'is_stale': isStale,
+    'checked_at': checkedAt.toUtc().toIso8601String(),
+    if (error != null) 'error': error.toString(),
+  };
 
   @override
   String toString() =>

@@ -26,28 +26,30 @@ void main() {
   VersionManager manager({
     VersionManagerConfig config = baseConfig,
     required MockClientHandler handler,
-  }) =>
-      VersionManager(
-        config,
-        platform: platform,
-        httpClient: MockClient(handler),
-        clock: () => now,
-      );
+  }) => VersionManager(
+    config,
+    platform: platform,
+    httpClient: MockClient(handler),
+    clock: () => now,
+  );
 
   MockClientHandler ok(Map<String, dynamic> body) =>
       (_) async => http.Response(jsonEncode(body), 200);
 
-  MockClientHandler down() => (_) async => http.Response('', 503);
+  MockClientHandler down() =>
+      (_) async => http.Response('', 503);
 
   final customBody = sampleBody(minimum: {'version': '2.5.0', 'build': 250});
 
   group('VersionManager.checkVersion', () {
     test('network success evaluates and caches', () async {
       var calls = 0;
-      final m = manager(handler: (r) async {
-        calls++;
-        return http.Response(jsonEncode(customBody), 200);
-      });
+      final m = manager(
+        handler: (r) async {
+          calls++;
+          return http.Response(jsonEncode(customBody), 200);
+        },
+      );
 
       final result = await m.checkVersion();
 
@@ -57,8 +59,10 @@ void main() {
       expect(result.latest, VersionInfo.parse('2.7.0', build: 270));
       expect(result.minimum, VersionInfo.parse('2.5.0', build: 250));
       expect(calls, 1);
-      expect(platform.store.keys.single,
-          'flutter_app_version_upgrader.policy.com.example.app.android.production');
+      expect(
+        platform.store.keys.single,
+        'flutter_app_version_upgrader.policy.com.example.app.android.production',
+      );
       expect(m.lastResult, same(result));
     });
 
@@ -82,16 +86,19 @@ void main() {
       expect(result.isStale, isFalse);
     });
 
-    test('API outage falls back to an expired cache and marks it stale', () async {
-      await manager(handler: ok(customBody)).checkVersion();
+    test(
+      'API outage falls back to an expired cache and marks it stale',
+      () async {
+        await manager(handler: ok(customBody)).checkVersion();
 
-      now = t0.add(const Duration(hours: 25));
-      final result = await manager(handler: down()).checkVersion();
+        now = t0.add(const Duration(hours: 25));
+        final result = await manager(handler: down()).checkVersion();
 
-      expect(result.source, CheckSource.cache);
-      expect(result.isStale, isTrue);
-      expect(result.status, UpdateStatus.updateRequired);
-    });
+        expect(result.source, CheckSource.cache);
+        expect(result.isStale, isTrue);
+        expect(result.status, UpdateStatus.updateRequired);
+      },
+    );
 
     test('expired cache is ignored when stale use is disabled', () async {
       await manager(handler: ok(customBody)).checkVersion();
@@ -140,10 +147,12 @@ void main() {
       await manager(handler: ok(customBody)).checkVersion();
 
       var calls = 0;
-      final m = manager(handler: (_) async {
-        calls++;
-        return http.Response(jsonEncode(customBody), 200);
-      });
+      final m = manager(
+        handler: (_) async {
+          calls++;
+          return http.Response(jsonEncode(customBody), 200);
+        },
+      );
       final cached = await m.checkVersion(preferCache: true);
       expect(cached.source, CheckSource.cache);
       expect(calls, 0);
@@ -156,11 +165,13 @@ void main() {
 
     test('concurrent checks share one request', () async {
       var calls = 0;
-      final m = manager(handler: (_) async {
-        calls++;
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-        return http.Response(jsonEncode(customBody), 200);
-      });
+      final m = manager(
+        handler: (_) async {
+          calls++;
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          return http.Response(jsonEncode(customBody), 200);
+        },
+      );
       final results = await Future.wait([m.checkVersion(), m.checkVersion()]);
       expect(calls, 1);
       expect(results[0], same(results[1]));

@@ -42,9 +42,9 @@ class SemanticVersion implements Comparable<SemanticVersion> {
     this.patch, {
     this.preRelease = const [],
     this.build = const [],
-  })  : assert(major >= 0, 'major must be >= 0'),
-        assert(minor >= 0, 'minor must be >= 0'),
-        assert(patch >= 0, 'patch must be >= 0');
+  }) : assert(major >= 0, 'major must be >= 0'),
+       assert(minor >= 0, 'minor must be >= 0'),
+       assert(patch >= 0, 'patch must be >= 0');
 
   /// Parses [input], throwing [VersionFormatException] on failure.
   factory SemanticVersion.parse(String input) {

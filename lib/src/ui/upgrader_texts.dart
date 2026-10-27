@@ -67,8 +67,9 @@ class UpgraderTexts {
   /// Resolves the soft prompt message for [result].
   String resolveAvailableMessage(VersionCheckResult result) {
     final server = result.updateMessage;
-    final template =
-        useServerMessageForSoftPrompt && server != null ? server : availableMessage;
+    final template = useServerMessageForSoftPrompt && server != null
+        ? server
+        : availableMessage;
     return fill(template, result);
   }
 
@@ -90,18 +91,17 @@ class UpgraderTexts {
     String? releaseNotesTitle,
     String? versionLine,
     bool? useServerMessageForSoftPrompt,
-  }) =>
-      UpgraderTexts(
-        requiredTitle: requiredTitle ?? this.requiredTitle,
-        requiredMessage: requiredMessage ?? this.requiredMessage,
-        availableTitle: availableTitle ?? this.availableTitle,
-        availableMessage: availableMessage ?? this.availableMessage,
-        updateButton: updateButton ?? this.updateButton,
-        laterButton: laterButton ?? this.laterButton,
-        skipButton: skipButton ?? this.skipButton,
-        releaseNotesTitle: releaseNotesTitle ?? this.releaseNotesTitle,
-        versionLine: versionLine ?? this.versionLine,
-        useServerMessageForSoftPrompt:
-            useServerMessageForSoftPrompt ?? this.useServerMessageForSoftPrompt,
-      );
+  }) => UpgraderTexts(
+    requiredTitle: requiredTitle ?? this.requiredTitle,
+    requiredMessage: requiredMessage ?? this.requiredMessage,
+    availableTitle: availableTitle ?? this.availableTitle,
+    availableMessage: availableMessage ?? this.availableMessage,
+    updateButton: updateButton ?? this.updateButton,
+    laterButton: laterButton ?? this.laterButton,
+    skipButton: skipButton ?? this.skipButton,
+    releaseNotesTitle: releaseNotesTitle ?? this.releaseNotesTitle,
+    versionLine: versionLine ?? this.versionLine,
+    useServerMessageForSoftPrompt:
+        useServerMessageForSoftPrompt ?? this.useServerMessageForSoftPrompt,
+  );
 }

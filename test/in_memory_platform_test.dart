@@ -31,7 +31,9 @@ void main() {
       final m = VersionManager(
         config,
         platform: InMemoryFlutterAppVersionUpgraderPlatform(),
-        httpClient: MockClient((_) async => http.Response(jsonEncode(body), 200)),
+        httpClient: MockClient(
+          (_) async => http.Response(jsonEncode(body), 200),
+        ),
       );
       final result = await m.checkVersion();
       expect(result.status, UpdateStatus.checkFailed);
@@ -74,27 +76,34 @@ void main() {
       final m = VersionManager(
         config.copyWith(currentVersionOverride: VersionInfo.parse('1.0.0')),
         platform: InMemoryFlutterAppVersionUpgraderPlatform(),
-        httpClient: MockClient((_) async => http.Response(jsonEncode(body), 200)),
+        httpClient: MockClient(
+          (_) async => http.Response(jsonEncode(body), 200),
+        ),
       );
       final result = await m.checkVersion();
       expect(result.status, UpdateStatus.checkFailed);
       expect(result.error, isA<UnsupportedError>());
     });
 
-    test('static initialize does not throw on an unsupported platform', () async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
-      addTearDown(() {
-        debugDefaultTargetPlatformOverride = null;
-        VersionManager.reset();
-      });
-      final logs = <String>[];
-      await VersionManager.initialize(
-        config.copyWith(logger: (m, [e]) => logs.add(m)),
-        httpClient: MockClient((_) async => http.Response(jsonEncode(body), 200)),
-      );
-      final result = await VersionManager.check();
-      expect(result.status, UpdateStatus.checkFailed);
-      expect(logs, contains(contains('initialize')));
-    });
+    test(
+      'static initialize does not throw on an unsupported platform',
+      () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+        addTearDown(() {
+          debugDefaultTargetPlatformOverride = null;
+          VersionManager.reset();
+        });
+        final logs = <String>[];
+        await VersionManager.initialize(
+          config.copyWith(logger: (m, [e]) => logs.add(m)),
+          httpClient: MockClient(
+            (_) async => http.Response(jsonEncode(body), 200),
+          ),
+        );
+        final result = await VersionManager.check();
+        expect(result.status, UpdateStatus.checkFailed);
+        expect(logs, contains(contains('initialize')));
+      },
+    );
   });
 }

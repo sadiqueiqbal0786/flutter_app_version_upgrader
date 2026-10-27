@@ -5,29 +5,29 @@ Map<String, dynamic> sampleBody({
   Map<String, dynamic>? minimum,
   Map<String, dynamic>? policy,
   int schema = 1,
-}) =>
-    {
-      'schema_version': schema,
-      'app': {
-        'id': 'com.example.app',
-        'platform': 'android',
-        'channel': 'production',
+}) => {
+  'schema_version': schema,
+  'app': {
+    'id': 'com.example.app',
+    'platform': 'android',
+    'channel': 'production',
+  },
+  'latest': {'version': '2.7.0', 'build': 270},
+  'minimum': ?minimum,
+  'recommended': {'version': '2.7.0', 'build': 270},
+  'policy':
+      policy ??
+      {
+        'mode': 'custom',
+        'force_update': true,
+        'update_message': 'Please update to continue.',
       },
-      'latest': {'version': '2.7.0', 'build': 270},
-      'minimum': ?minimum,
-      'recommended': {'version': '2.7.0', 'build': 270},
-      'policy': policy ??
-          {
-            'mode': 'custom',
-            'force_update': true,
-            'update_message': 'Please update to continue.',
-          },
-      'update': {
-        'url': 'https://play.google.com/store/apps/details?id=com.example.app',
-        'release_notes': 'Bug fixes.',
-      },
-      'server_time': '2026-10-27T05:30:00Z',
-    };
+  'update': {
+    'url': 'https://play.google.com/store/apps/details?id=com.example.app',
+    'release_notes': 'Bug fixes.',
+  },
+  'server_time': '2026-10-27T05:30:00Z',
+};
 
 void main() {
   group('VersionCheckResponse.fromJson', () {
@@ -65,13 +65,17 @@ void main() {
 
     test('rejects a missing latest', () {
       final body = sampleBody()..remove('latest');
-      expect(() => VersionCheckResponse.fromJson(body),
-          throwsA(isA<VersionResponseException>()));
+      expect(
+        () => VersionCheckResponse.fromJson(body),
+        throwsA(isA<VersionResponseException>()),
+      );
     });
 
     test('rejects a newer schema version', () {
-      expect(() => VersionCheckResponse.fromJson(sampleBody(schema: 2)),
-          throwsA(isA<VersionResponseException>()));
+      expect(
+        () => VersionCheckResponse.fromJson(sampleBody(schema: 2)),
+        throwsA(isA<VersionResponseException>()),
+      );
     });
 
     test('round-trips through toJson', () {

@@ -193,7 +193,8 @@ class VersionUpgraderState extends State<VersionUpgrader>
   }
 
   void _bind() {
-    _manager = widget.manager ??
+    _manager =
+        widget.manager ??
         (VersionManager.isInitialized ? VersionManager.instance : null);
     final m = _manager;
     if (m == null) return;
@@ -281,8 +282,8 @@ class VersionUpgraderState extends State<VersionUpgrader>
     final r = _result;
     if (r == null) return widget.child;
 
-    final blocked = r.isBlocked ||
-        (widget.options.blockWhenCheckFails && r.isFailed);
+    final blocked =
+        r.isBlocked || (widget.options.blockWhenCheckFails && r.isFailed);
     if (blocked) {
       final builder = widget.requiredBuilder;
       if (builder != null) return builder(context, r, _update);

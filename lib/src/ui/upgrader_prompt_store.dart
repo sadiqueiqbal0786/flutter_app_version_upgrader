@@ -8,7 +8,7 @@ import '../platform/flutter_app_version_upgrader_platform_interface.dart';
 class UpgraderPromptStore {
   /// Creates a store backed by [platform].
   UpgraderPromptStore(this._platform, {DateTime Function()? clock})
-      : _clock = clock ?? (() => DateTime.now().toUtc());
+    : _clock = clock ?? (() => DateTime.now().toUtc());
 
   static const _key = 'flutter_app_version_upgrader.prompt';
 

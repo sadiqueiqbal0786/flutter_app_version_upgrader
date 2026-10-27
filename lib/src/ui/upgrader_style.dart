@@ -142,45 +142,44 @@ class UpgraderStyle {
     bool? animateHero,
     bool? blurBackdrop,
     bool? showVersionChips,
-  }) =>
-      UpgraderStyle(
-        platformAdaptive: platformAdaptive ?? this.platformAdaptive,
-        accentColor: accentColor ?? this.accentColor,
-        backgroundColor: backgroundColor ?? this.backgroundColor,
-        foregroundColor: foregroundColor ?? this.foregroundColor,
-        mutedColor: mutedColor ?? this.mutedColor,
-        barrierColor: barrierColor ?? this.barrierColor,
-        borderRadius: borderRadius ?? this.borderRadius,
-        buttonBorderRadius: buttonBorderRadius ?? this.buttonBorderRadius,
-        buttonHeight: buttonHeight ?? this.buttonHeight,
-        padding: padding ?? this.padding,
-        titleStyle: titleStyle ?? this.titleStyle,
-        messageStyle: messageStyle ?? this.messageStyle,
-        captionStyle: captionStyle ?? this.captionStyle,
-        icon: icon ?? this.icon,
-        iconSize: iconSize ?? this.iconSize,
-        illustration: illustration ?? this.illustration,
-        showDragHandle: showDragHandle ?? this.showDragHandle,
-        presentation: presentation ?? this.presentation,
-        animationDuration: animationDuration ?? this.animationDuration,
-        heroGradient: heroGradient ?? this.heroGradient,
-        animateHero: animateHero ?? this.animateHero,
-        blurBackdrop: blurBackdrop ?? this.blurBackdrop,
-        showVersionChips: showVersionChips ?? this.showVersionChips,
-      );
+  }) => UpgraderStyle(
+    platformAdaptive: platformAdaptive ?? this.platformAdaptive,
+    accentColor: accentColor ?? this.accentColor,
+    backgroundColor: backgroundColor ?? this.backgroundColor,
+    foregroundColor: foregroundColor ?? this.foregroundColor,
+    mutedColor: mutedColor ?? this.mutedColor,
+    barrierColor: barrierColor ?? this.barrierColor,
+    borderRadius: borderRadius ?? this.borderRadius,
+    buttonBorderRadius: buttonBorderRadius ?? this.buttonBorderRadius,
+    buttonHeight: buttonHeight ?? this.buttonHeight,
+    padding: padding ?? this.padding,
+    titleStyle: titleStyle ?? this.titleStyle,
+    messageStyle: messageStyle ?? this.messageStyle,
+    captionStyle: captionStyle ?? this.captionStyle,
+    icon: icon ?? this.icon,
+    iconSize: iconSize ?? this.iconSize,
+    illustration: illustration ?? this.illustration,
+    showDragHandle: showDragHandle ?? this.showDragHandle,
+    presentation: presentation ?? this.presentation,
+    animationDuration: animationDuration ?? this.animationDuration,
+    heroGradient: heroGradient ?? this.heroGradient,
+    animateHero: animateHero ?? this.animateHero,
+    blurBackdrop: blurBackdrop ?? this.blurBackdrop,
+    showVersionChips: showVersionChips ?? this.showVersionChips,
+  );
 
   /// Resolves every unset field against [context]'s theme and platform.
   ResolvedUpgraderStyle resolve(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final cupertino = platformAdaptive &&
+    final cupertino =
+        platformAdaptive &&
         (theme.platform == TargetPlatform.iOS ||
             theme.platform == TargetPlatform.macOS);
     final accent = accentColor ?? scheme.primary;
     final fg = foregroundColor ?? scheme.onSurface;
     final muted = mutedColor ?? scheme.onSurfaceVariant;
-    final radius = borderRadius ??
-        BorderRadius.circular(cupertino ? 20 : 28);
+    final radius = borderRadius ?? BorderRadius.circular(cupertino ? 20 : 28);
     return ResolvedUpgraderStyle(
       cupertino: cupertino,
       accent: accent,
@@ -194,20 +193,26 @@ class UpgraderStyle {
           buttonBorderRadius ?? BorderRadius.circular(cupertino ? 14 : 100),
       buttonHeight: buttonHeight,
       padding: padding,
-      title: (cupertino
-              ? theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700, letterSpacing: -0.4)
-              : theme.textTheme.headlineSmall)
-          ?.copyWith(color: fg)
-          .merge(titleStyle),
+      title:
+          (cupertino
+                  ? theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.4,
+                    )
+                  : theme.textTheme.headlineSmall)
+              ?.copyWith(color: fg)
+              .merge(titleStyle),
       message: theme.textTheme.bodyLarge
           ?.copyWith(color: fg, height: 1.4)
           .merge(messageStyle),
       caption: theme.textTheme.bodySmall
           ?.copyWith(color: muted)
           .merge(captionStyle),
-      icon: icon ??
-          (cupertino ? CupertinoIcons.arrow_down_to_line : Icons.download_rounded),
+      icon:
+          icon ??
+          (cupertino
+              ? CupertinoIcons.arrow_down_to_line
+              : Icons.download_rounded),
       iconSize: iconSize,
       illustration: illustration,
       showDragHandle: showDragHandle,
@@ -215,7 +220,8 @@ class UpgraderStyle {
       animationDuration: animationDuration,
       // Light themes get a lift towards white; dark themes (whose primary is
       // already pale) get depth towards black so the gradient stays visible.
-      heroGradient: heroGradient ??
+      heroGradient:
+          heroGradient ??
           (theme.brightness == Brightness.dark
               ? [Color.lerp(accent, Colors.black, 0.22) ?? accent, accent]
               : [accent, Color.lerp(accent, Colors.white, 0.28) ?? accent]),
@@ -228,8 +234,8 @@ class UpgraderStyle {
 
   static Color _contrast(Color c) =>
       ThemeData.estimateBrightnessForColor(c) == Brightness.dark
-          ? Colors.white
-          : Colors.black;
+      ? Colors.white
+      : Colors.black;
 }
 
 /// An [UpgraderStyle] with every value filled in.
