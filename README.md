@@ -6,242 +6,382 @@
 ![iOS](https://img.shields.io/badge/platform-iOS-000000?logo=apple&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Remote-controlled app version management for Flutter, by [Sadique Iqbal](https://github.com/sadiqueiqbal0786).
-
-The plugin asks your version API which release is the **latest** and which is
-the **minimum** an administrator still allows, compares both against the
-installed version, and hands back a decision. It never shows UI, so the same
-plugin works in any app.
-
-```text
-STORE          →  latest published version      (discovered automatically)
-ADMIN POLICY   →  minimum supported version     (defaults to latest, can be pinned)
-PLUGIN         →  UP_TO_DATE | UPDATE_AVAILABLE | UPDATE_REQUIRED | CHECK_FAILED
-```
-
-## Features
-
-- Proper semantic version comparison (`2.10.0 > 2.9.0`), with pre-release
-  precedence and build numbers as a tie-breaker.
-- Policy modes from the backend: `auto_latest`, `custom`, `age_based`.
-- Separate **latest**, **recommended** and **minimum** versions.
-- Channels (`production`, `beta`, `alpha`, `internal`) baked into every
-  request and cache key, so production users never see beta data.
-- Last-known-good cache in native storage with a TTL, used when the API is
-  down. Fail-open by default, fail-closed if you choose.
-- Opens the Play Store / App Store page, preferring the URL the backend
-  returns.
-- Optional built-in UI (`ui.dart`): themeable, platform-adaptive update
-  page and Update / Later / Skip sheet, with full builder overrides.
-- Pluggable response validation hook for signed responses.
-- No store credentials or secrets in the app.
-
-## Platform support
-
-| Platform | Support |
-|---|---|
-| Android | Native (`minSdk 24`) |
-| iOS | Native (iOS 15+) |
-| Web, macOS, Windows, Linux | Guarded fallback: no exception is thrown. `check()` returns `checkFailed` and fails open unless you set `appId` and `currentVersionOverride`, in which case the check runs with an in-memory cache. `openStore` returns `false`. |
-
-`VersionManager.isPlatformSupported` tells you at runtime which case you are in.
-
-## Install
-
-```yaml
-dependencies:
-  flutter_app_version_upgrader: ^0.2.1
-```
-
-Android needs `minSdk 24`; iOS needs 15.0.
-
-## Usage
-
-```dart
-import 'package:flutter_app_version_upgrader/flutter_app_version_upgrader.dart';
-
-await VersionManager.initialize(
-  const VersionManagerConfig(
-    baseUrl: 'https://versions.example.com',
-    channel: VersionChannel.production,
-    apiKey: 'public-client-key',          // optional, sent as X-Api-Key
-    appStoreId: '123456789',              // optional iOS fallback store link
-    cacheTtl: Duration(hours: 24),
-    failurePolicy: FailurePolicy.open,    // default
-  ),
-);
-
-final result = await VersionManager.check();
-
-switch (result.status) {
-  case UpdateStatus.updateRequired:
-    // Block the app. result.updateMessage holds the admin's text.
-    await VersionManager.openStore(result);
-  case UpdateStatus.updateAvailable:
-    // Offer a soft update.
-  case UpdateStatus.upToDate:
-  case UpdateStatus.checkFailed:
-    // result.isBlocked tells you whether to block on failure.
-}
-```
-
-`result` carries everything the server knew, not just a verdict:
-
-| Field | Meaning |
-|---|---|
-| `current` | Installed version and build |
-| `latest` | Newest published release |
-| `minimum` | Oldest version allowed to run |
-| `recommended` | Version users are nudged towards, if any |
-| `policy` | Mode, `forceUpdate`, `enabled`, `updateMessage` |
-| `updateUrl` | Store page supplied by the backend |
-| `source` | `network`, `cache` or `none` |
-| `isStale` | Cache was past its TTL when used |
-| `isBlocked` | Whether the host app should stop normal use |
-
-### On resume
-
-Call `VersionManager.check(preferCache: true)` on app resume. It returns the
-cached policy without a network round trip while the cache is fresh, and
-refreshes it otherwise.
-
-### Dependency injection
-
-`VersionManager` can be constructed directly with your own `http.Client`,
-platform implementation and clock. The static `VersionManager.*` methods are
-a convenience over a shared instance.
-
-### Decision rules
-
-1. Policy disabled → never `updateRequired`.
-2. `current < minimum` and `policy.forceUpdate` → `updateRequired`.
-3. `current < latest` → `updateAvailable`.
-4. Otherwise → `upToDate`.
-
-If the API is unreachable: use the cache (fresh, or stale when
-`allowStaleCache` is on). With no cache at all: `checkFailed`, and
-`isBlocked` follows `failurePolicy`.
-
-## Built-in UI (optional)
+Force and soft app updates, controlled from your server instead of a new
+release. By [Sadique Iqbal](https://github.com/sadiqueiqbal0786).
 
 | Update required | Update available | Dark mode |
 |---|---|---|
-| ![Update required](doc/screenshots/required_light.png) | ![Update available](doc/screenshots/available_light.png) | ![Dark](doc/screenshots/available_dark.png) |
+| ![Update required](https://raw.githubusercontent.com/sadiqueiqbal0786/flutter_app_version_upgrader/main/doc/screenshots/required_light.png) | ![Update available](https://raw.githubusercontent.com/sadiqueiqbal0786/flutter_app_version_upgrader/main/doc/screenshots/available_light.png) | ![Dark](https://raw.githubusercontent.com/sadiqueiqbal0786/flutter_app_version_upgrader/main/doc/screenshots/available_dark.png) |
 
-The core library never shows UI. If you want ready-made screens, import
-the UI library and wrap your app:
+## What it does
+
+Your app asks a small HTTPS endpoint two questions on every launch: what is
+the **latest** published version, and what is the **minimum** version still
+allowed to run. The plugin compares both with the installed version and
+gives you a decision:
+
+| Decision | Meaning | Built-in UI |
+|---|---|---|
+| `updateRequired` | Installed version is below the minimum | Full-screen page, cannot be dismissed |
+| `updateAvailable` | A newer version exists but this one may run | Bottom sheet with Update, Later, Skip this version |
+| `upToDate` | Nothing newer | Nothing |
+| `checkFailed` | Endpoint unreachable and no cache | Nothing (fails open by default) |
+
+Change the minimum on the server and every running app follows on its next
+launch. No store submission, no app rebuild.
+
+**Highlights**
+
+- Correct semantic version comparison (`2.10.0` is newer than `2.9.0`), build
+  numbers as a tie-breaker.
+- Latest, recommended and minimum versions kept separate, plus
+  `auto_latest`, `custom` and `age_based` policy modes.
+- Channels (`production`, `beta`, `alpha`, `internal`) so TestFlight or Play
+  testers are measured against their own track.
+- Last known policy cached natively with a TTL; outages never lock users
+  out unless you choose fail-closed.
+- Opens the Play Store, App Store or TestFlight page.
+- Optional, themeable, platform-adaptive UI, or bring your own widgets.
+- No store credentials or secrets inside the app.
+- Web and desktop never throw: the plugin steps aside there.
+
+## Quick start
+
+### 1. Install
+
+```yaml
+dependencies:
+  flutter_app_version_upgrader: ^0.2.2
+```
+
+Requirements: Flutter 3.3+, Dart 3.13+, Android `minSdk 24`, iOS 15.
+Nothing to add to `AndroidManifest.xml` or `Info.plist`.
+
+### 2. Initialise once, before `runApp`
 
 ```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_app_version_upgrader/flutter_app_version_upgrader.dart';
 import 'package:flutter_app_version_upgrader/ui.dart';
 
-MaterialApp(
-  builder: (context, child) => VersionUpgrader(child: child!),
-  home: const HomePage(),
-)
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await VersionManager.initialize(
+    const VersionManagerConfig(
+      baseUrl: 'https://versions.example.com', // your endpoint, see step 4
+      channel: VersionChannel.production,
+    ),
+  );
+
+  runApp(const MyApp());
+}
 ```
 
-That gives you, with no further code:
-
-| Decision | What the user sees |
-|---|---|
-| `updateRequired` | Full-screen, non-dismissible page with the admin's message and an Update button |
-| `updateAvailable` | Bottom sheet with Update, Later and Skip this version. Later snoozes for a day, Skip hides that version for good. Both are remembered across restarts |
-| `upToDate`, `checkFailed` | Nothing; the app renders normally |
-
-The default look: a gradient hero with softly pulsing rings, "installed →
-latest" version chips, a release-notes card, a gradient primary button with
-a coloured shadow, a blurred backdrop behind the sheet, and staggered
-entrance animations. It is platform-adaptive (Material secondary buttons
-on Android, Cupertino ones and tighter radii on iOS and macOS) and every
-colour comes from your `Theme`, light or dark, unless you override it.
-
-Three layers of customisation, from lightest to heaviest:
+### 3. Wrap your app
 
 ```dart
-VersionUpgrader(
-  // 1. Wording and localisation. {current}, {latest}, {minimum} are filled in.
-  texts: const UpgraderTexts(
-    availableTitle: 'Nueva versión',
-    availableMessage: 'La versión {latest} ya está disponible.',
-    updateButton: 'Actualizar',
-    laterButton: 'Más tarde',
-    skipButton: 'Omitir esta versión',
-  ),
-  // 2. Look: colours, radii, icon or any illustration widget, presentation.
-  style: UpgraderStyle(
-    accentColor: const Color(0xFF0B5FFF),
-    heroGradient: const [Color(0xFF0B5FFF), Color(0xFF7C4DFF)],
-    presentation: UpgraderPresentation.dialog, // or bottomSheet, fullScreen
-    illustration: Image.asset('assets/update.png', height: 120), // replaces the hero
-    borderRadius: BorderRadius.circular(16),
-    blurBackdrop: false,
-    animateHero: false,
-    showVersionChips: false,
-  ),
-  // 3. Behaviour.
-  options: const UpgraderOptions(
-    initialDelay: Duration(seconds: 1),
-    remindLaterAfter: Duration(days: 3),
-    allowSkipVersion: false,
-    softPromptOnlyBelowRecommended: true,
-  ),
-  // Hooks for analytics or custom navigation.
-  onResult: (r) => analytics.log('version_check', r.toJson()),
-  onUpdatePressed: (r) async { /* return true to handle it yourself */ return false; },
-  child: child!,
-)
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // Covers every route, so a required update blocks the whole app.
+      builder: (context, child) => VersionUpgrader(child: child!),
+      home: const HomePage(),
+    );
+  }
+}
 ```
 
-To replace the widgets entirely while keeping the checking, snooze and
-skip logic, pass builders:
+That is the whole integration. On launch and on every return to the
+foreground the plugin checks, and the built-in UI shows the right thing.
 
-```dart
-VersionUpgrader(
-  requiredBuilder: (context, result, onUpdate) => MyBlockingPage(result, onUpdate),
-  availableBuilder: (context, result, onUpdate, onLater, onSkip) =>
-      MySheet(result, onUpdate: onUpdate, onLater: onLater, onSkip: onSkip),
-  child: child!,
-)
-```
-
-`UpdateRequiredScreen`, `UpdateAvailablePrompt` and `UpgraderContent` are
-exported too, so you can reuse the pieces inside your own layout.
-
-## Backend contract
+### 4. Give it an endpoint
 
 The plugin calls:
 
 ```text
-GET {baseUrl}/v1/version/check?app_id=&platform=&channel=&version=&build=
+GET {baseUrl}/v1/version/check?app_id=<id>&platform=<android|ios>&channel=<channel>&version=<installed>&build=<installed build>
 ```
 
-and expects the JSON documented in [doc/api_contract.md](doc/api_contract.md).
+and expects this JSON (full contract in
+[doc/api_contract.md](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader/blob/main/doc/api_contract.md)):
 
-A complete reference backend lives in [backend/](backend/): Google Play and
-App Store Connect pollers, release database, policy engine
-(`auto_latest` / `custom` / `age_based`), admin API and dashboard. Its
-README lists the credentials you must provide. For a quick local run
-without any backend, `example/tool/mock_version_server.dart` serves the
-same contract.
+```json
+{
+  "schema_version": 1,
+  "app": { "id": "com.example.app", "platform": "android", "channel": "production" },
+  "latest":  { "version": "2.7.0", "build": 270 },
+  "minimum": { "version": "2.5.0", "build": 250 },
+  "policy":  { "mode": "custom", "force_update": true, "update_message": "Please update to continue." },
+  "update":  { "url": "https://play.google.com/store/apps/details?id=com.example.app", "release_notes": "Bug fixes." }
+}
+```
 
-## Security notes
+Pick whichever of these suits you:
 
-- Keep Google Play / App Store Connect credentials on the server.
-- Use HTTPS. Add an `X-Api-Key` or custom headers through the config.
-- To verify signed responses, supply `responseValidator` and check the
-  signature header against the raw body. The backend README shows the
-  exact HMAC scheme and a Dart snippet.
+| Option | Effort | You get |
+|---|---|---|
+| **A. Static JSON file** on any host (Firebase Hosting, S3, GitHub Pages, your API) | Minutes | Remote-controlled minimum and latest. You edit the file when you release. Set `checkPath` to the file's path. |
+| **B. Reference backend** in this repo's [`backend/`](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader/tree/main/backend) | An afternoon | Latest discovered automatically from Google Play, App Store and TestFlight, age-based minimum, admin dashboard, installed-version stats. Nothing to do per release. |
+| **C. Your own API** | Depends | Return the JSON above from an endpoint you already run. |
+
+For option A with a static file:
+
+```dart
+VersionManagerConfig(
+  baseUrl: 'https://cdn.example.com',
+  checkPath: '/app-versions/android-production.json', // one file per platform/channel
+)
+```
+
+## Configuration reference
+
+Every option of `VersionManagerConfig`:
+
+| Option | Default | What it does |
+|---|---|---|
+| `baseUrl` | required | Base URL of your endpoint |
+| `appId` | package name / bundle id | Value sent as `app_id` |
+| `channel` | `production` | `production`, `beta`, `alpha`, `internal`. Use `beta` for TestFlight / Play beta builds |
+| `checkPath` | `/v1/version/check` | Path appended to `baseUrl` |
+| `apiKey` | none | Sent as `X-Api-Key` |
+| `headers` | `{}` | Extra headers on every request |
+| `timeout` | 10 s | Network timeout |
+| `cacheTtl` | 24 h | How long the last answer is considered fresh |
+| `allowStaleCache` | `true` | When the endpoint is down, reuse an expired cache rather than fail |
+| `failurePolicy` | `open` | `open` lets the app run when nothing is known; `closed` blocks |
+| `responseValidator` | none | Callback to verify a signature before trusting a response |
+| `appStoreId` | none | Numeric App Store id, fallback link on iOS when the server sends no `update.url` |
+| `currentVersionOverride` | none | Pretend to be another version (debug menus, tests, desktop) |
+| `logger` | none | Receives diagnostic messages |
+
+Pass build-specific values with `--dart-define` so each flavour gets the
+right channel:
+
+```sh
+flutter build ipa --dart-define=VERSION_CHANNEL=beta
+```
+
+```dart
+const channelName = String.fromEnvironment('VERSION_CHANNEL', defaultValue: 'production');
+VersionManagerConfig(
+  baseUrl: '...',
+  channel: VersionChannel.fromWireName(channelName) ?? VersionChannel.production,
+)
+```
+
+## Customising the UI
+
+`VersionUpgrader` has three layers. Use the lightest one that gets you
+there.
+
+### Wording and localisation
+
+Every string is replaceable. `{current}`, `{latest}` and `{minimum}` are
+filled in for you.
+
+```dart
+VersionUpgrader(
+  texts: const UpgraderTexts(
+    requiredTitle: 'Update required',
+    requiredMessage: 'Version {minimum} or newer is needed to continue.',
+    availableTitle: 'A new version is ready',
+    availableMessage: 'Version {latest} has the latest improvements.',
+    updateButton: 'Update now',
+    laterButton: 'Not now',
+    skipButton: 'Skip this version',
+    releaseNotesTitle: "What's new",
+  ),
+  child: child!,
+)
+```
+
+The server's `update_message`, when present, replaces `requiredMessage` on
+the blocking page. Set `useServerMessageForSoftPrompt: true` to use it on
+the sheet as well.
+
+### Look and feel
+
+Colours and type come from your `Theme` by default, in light and dark.
+Override what you need:
+
+```dart
+VersionUpgrader(
+  style: UpgraderStyle(
+    accentColor: const Color(0xFF0B5FFF),
+    heroGradient: const [Color(0xFF0B5FFF), Color(0xFF7C4DFF)],
+    presentation: UpgraderPresentation.bottomSheet, // or .dialog, .fullScreen
+    illustration: Image.asset('assets/update.png', height: 120), // replaces the icon
+    borderRadius: BorderRadius.circular(20),
+    buttonBorderRadius: BorderRadius.circular(12),
+    titleStyle: const TextStyle(fontFamily: 'YourBrandFont'),
+    showVersionChips: true,
+    blurBackdrop: true,
+    animateHero: true,
+    platformAdaptive: true, // Cupertino secondary buttons on iOS
+  ),
+  child: child!,
+)
+```
+
+### Behaviour
+
+```dart
+VersionUpgrader(
+  options: const UpgraderOptions(
+    checkOnStart: true,
+    checkOnResume: true,
+    initialDelay: Duration(seconds: 1),      // let a splash finish first
+    showSoftPrompt: true,                    // false = only ever block
+    allowSkipVersion: true,
+    allowLater: true,
+    remindLaterAfter: Duration(days: 1),
+    softPromptOnlyBelowRecommended: false,   // true = nag only below `recommended`
+  ),
+  onResult: (result) => analytics.log('version_check', result.toJson()),
+  onUpdatePressed: (result) async {
+    // Return true to handle it yourself (in-app update, custom route).
+    return false;
+  },
+  onSkipped: (version) => analytics.log('version_skipped', {'v': '$version'}),
+  child: child!,
+)
+```
+
+"Skip this version" and "Later" are persisted natively, so the same version
+is never offered twice and the reminder survives restarts.
+
+### Your own widgets
+
+Keep the checking, caching, skip and snooze logic but draw everything
+yourself:
+
+```dart
+VersionUpgrader(
+  requiredBuilder: (context, result, onUpdate) => MyBlockingPage(
+    message: result.updateMessage,
+    latest: result.latest,
+    onUpdate: onUpdate,
+  ),
+  availableBuilder: (context, result, onUpdate, onLater, onSkip) => MyUpdateSheet(
+    result: result,
+    onUpdate: onUpdate,
+    onLater: onLater,
+    onSkip: onSkip,
+  ),
+  child: child!,
+)
+```
+
+The pieces of the default UI (`UpdateRequiredScreen`,
+`UpdateAvailablePrompt`, `UpgraderContent`, `UpgraderHero`, `VersionChips`,
+`ReleaseNotesCard`, `UpgraderPrimaryButton`) are exported for reuse inside
+your own layouts.
+
+### No UI at all
+
+Skip the `ui.dart` import and drive your own flow from the result:
+
+```dart
+final result = await VersionManager.check();
+
+switch (result.status) {
+  case UpdateStatus.updateRequired:
+    showMyBlockingDialog(result.updateMessage);
+    await VersionManager.openStore(result);
+  case UpdateStatus.updateAvailable:
+    showMySnackbar('Version ${result.latest} is available');
+  case UpdateStatus.upToDate:
+  case UpdateStatus.checkFailed:
+    break;
+}
+```
+
+`result` carries `current`, `latest`, `minimum`, `recommended`, `policy`,
+`updateUrl`, `updateMessage`, `releaseNotes`, `source` (`network`, `cache`,
+`none`), `isStale`, `isBlocked`, and the convenience getters
+`isUpdateRequired`, `isUpdateAvailable`, `isBelowMinimum`,
+`isBelowRecommended`.
+
+## How a decision is made
+
+1. If the policy is disabled, never `updateRequired`.
+2. `current < minimum` and `policy.forceUpdate` → `updateRequired`.
+3. `current < latest` → `updateAvailable`.
+4. Otherwise → `upToDate`.
+
+If the endpoint cannot be reached: use the cache (fresh, or stale when
+`allowStaleCache` is on). With no cache at all: `checkFailed`, and
+`isBlocked` follows `failurePolicy`.
+
+Versions are compared as semantic versions first; the build number only
+breaks ties within the same version, matching how both stores behave.
+
+## Platform notes
+
+| Platform | Support |
+|---|---|
+| Android | Native. Reads `versionName` / `versionCode`, caches in `SharedPreferences`, opens `market://` then the Play web page |
+| iOS | Native. Reads `CFBundleShortVersionString` / `CFBundleVersion`, caches in `UserDefaults`, opens the server's URL, else `itms-apps://` for the App Store id |
+| Web, macOS, Windows, Linux | Guarded. No exception is thrown; `check()` fails open. Set `appId` and `currentVersionOverride` to run checks there with an in-memory cache. `openStore` returns `false` |
+
+`VersionManager.isPlatformSupported` tells you which case applies at
+runtime.
+
+## Security
+
+- Store credentials stay on the server. The app only sends its own
+  version, platform and channel.
+- Use HTTPS. Add an `X-Api-Key` with `apiKey`, or any header with `headers`.
+- To verify signed responses, implement `responseValidator`. The reference
+  backend signs with HMAC-SHA256 over `"<timestamp>.<body>"` in the
+  `X-Signature` header:
+
+```dart
+responseValidator: (body, headers) {
+  final ts = headers['x-signature-timestamp'];
+  final sig = headers['x-signature'];
+  if (ts == null || sig == null) return false;
+  final mac = Hmac(sha256, utf8.encode(secret)).convert(utf8.encode('$ts.$body'));
+  return sig == 'sha256=$mac';
+}
+```
+
 - Certificate pinning is deliberately not built in.
 
-## Native layer
+## Testing your integration
 
-The platform code is intentionally small:
+- Use `currentVersionOverride` to make the app believe it is an old
+  version and watch the blocking page appear.
+- Run the mock endpoint shipped with the example:
+  `dart run example/tool/mock_version_server.dart --latest 2.7.0:270 --minimum 2.5.0:250`
+  and point `baseUrl` at `http://10.0.2.2:8080` (Android emulator) or
+  `http://localhost:8080` (iOS simulator).
+- `VersionManager` accepts an injected `http.Client` and platform, so unit
+  tests need no network. See `test/` for examples.
 
-| Method | Android | iOS |
-|---|---|---|
-| `getAppInfo` | `PackageManager` versionName / longVersionCode | `CFBundleShortVersionString` / `CFBundleVersion` |
-| `readCache` / `writeCache` / `clearCache` | `SharedPreferences` | `UserDefaults` |
-| `openStore` | `market://` then Play web URL | `itms-apps://` then App Store web URL |
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| Nothing ever shows | `checkFailed`: the URL is wrong or unreachable. Pass a `logger` and read the messages |
+| Shows "update required" on a fresh install | The server's `minimum` is above the installed version. Check `policy.mode` and the data for that channel |
+| TestFlight build told to update to an App Store version | The build runs with `channel: production`. Use `beta` for TestFlight builds |
+| `2.10.0` treated as older than `2.9.0` | Your server compares strings. Return proper versions; the plugin compares them correctly |
+| Soft prompt never returns after tapping Skip | That is by design, per version. A newer `latest` shows it again. Call `UpgraderPromptStore(VersionManager.instance.platform).clear()` to reset |
+| iOS opens Safari instead of the App Store | Send `https://apps.apple.com/app/id<ID>` or set `appStoreId` so the `itms-apps` link is used |
+
+## Reference backend
+
+[`backend/`](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader/tree/main/backend)
+is a FastAPI service that polls Google Play, App Store Connect and
+TestFlight, stores releases, applies `auto_latest` / `custom` / `age_based`
+policies, serves the endpoint above, and ships an admin dashboard. It is
+optional, not part of this package, and documented in its own README,
+including the exact credentials to provide and a Docker Compose setup.
 
 ## Author
 

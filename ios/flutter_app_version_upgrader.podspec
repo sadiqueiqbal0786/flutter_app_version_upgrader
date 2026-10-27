@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_app_version_upgrader'
-  s.version          = '0.2.1'
+  s.version          = '0.2.2'
   s.summary          = 'Remote-controlled app version management for Flutter.'
   s.description      = <<-DESC
 Reads the installed version, caches the last known version policy and opens

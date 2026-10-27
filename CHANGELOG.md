@@ -1,3 +1,9 @@
+## 0.2.2
+
+- README rewritten as a step-by-step guide: quick start, endpoint options,
+  full configuration reference, UI customisation, troubleshooting. No code
+  changes.
+
 ## 0.2.1
 
 - README: correct install snippet, add badges and author section. No code changes.

@@ -4,7 +4,7 @@ description: >-
   published version, enforces a configurable minimum version policy, caches
   the last known good policy, and returns an update decision without forcing
   any UI.
-version: 0.2.1
+version: 0.2.2
 homepage: https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader
 repository: https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader
 topics:
