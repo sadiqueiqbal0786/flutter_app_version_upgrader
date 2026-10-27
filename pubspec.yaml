@@ -1,0 +1,40 @@
+name: flutter_app_version_upgrader
+description: >-
+  Remote-controlled app version management for Flutter. Discovers the latest
+  published version, enforces a configurable minimum version policy, caches
+  the last known good policy, and returns an update decision without forcing
+  any UI.
+version: 0.2.0
+homepage: https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader
+repository: https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader
+topics:
+  - version
+  - update
+  - force-update
+  - app-store
+  - play-store
+
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.3.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  meta: ^1.10.0
+  plugin_platform_interface: ^2.1.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: io.github.sadiqueiqbal0786.flutter_app_version_upgrader
+        pluginClass: FlutterAppVersionUpgraderPlugin
+      ios:
+        pluginClass: FlutterAppVersionUpgraderPlugin

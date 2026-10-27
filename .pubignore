@@ -1,0 +1,12 @@
+# Without a git checkout pub does not read .gitignore, so list everything here.
+backend/
+**/build/
+**/.dart_tool/
+**/.idea/
+*.iml
+**/local.properties
+**/ephemeral/
+**/.flutter-plugins-dependencies
+**/*.db
+**/*.log
+.DS_Store
