@@ -62,6 +62,30 @@ docker compose up --build
 This starts PostgreSQL, Redis, runs migrations, the API on port 8000 and a
 separate worker that polls the stores every `VM_SYNC_INTERVAL_SECONDS`.
 
+## Deploy on your own server
+
+1. Copy the `backend/` directory to the server. Put the Play service-account
+   JSON and the App Store Connect `.p8` into `backend/secrets/` and fill
+   `backend/.env` from `.env.example`. Never commit either.
+2. `docker compose up -d --build` starts PostgreSQL, Redis, runs the
+   migrations, and launches the API on port 8000 plus the store-sync
+   worker. Put a reverse proxy with TLS in front (Caddy, nginx, a cloud
+   load balancer) so the plugin can reach it over HTTPS.
+3. Register the app and its policy, then trigger the first sync:
+
+   ```sh
+   VM_URL=https://versions.example.com VM_ADMIN_API_KEY=... \
+     scripts/seed_app.sh com.mtd.app "Manage The Day" com.mtd.app com.mtd.app 6746727961 90
+   ```
+
+4. Open `https://versions.example.com/admin/` and check the "Latest
+   published" card shows what the stores show.
+5. Put the base URL in the app: `--dart-define=VERSION_API_URL=https://versions.example.com`
+   and `--dart-define=VERSION_CHANNEL=production` (or `beta` for
+   TestFlight / Play beta builds).
+
+Health endpoints for your uptime monitor: `/health` and `/ready`.
+
 ## How a check is answered
 
 1. Look up the app by `app_id`; 404 if unknown (the plugin then falls back
