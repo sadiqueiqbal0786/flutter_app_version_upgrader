@@ -1,3 +1,7 @@
+## 0.2.1
+
+- README: correct install snippet, add badges and author section. No code changes.
+
 ## 0.2.0
 
 - Optional UI library (`package:flutter_app_version_upgrader/ui.dart`):

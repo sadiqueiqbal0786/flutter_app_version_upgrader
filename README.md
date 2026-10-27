@@ -1,6 +1,12 @@
 # flutter_app_version_upgrader
 
-Remote-controlled app version management for Flutter.
+[![pub package](https://img.shields.io/pub/v/flutter_app_version_upgrader.svg)](https://pub.dev/packages/flutter_app_version_upgrader)
+[![CI](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader/actions/workflows/ci.yml/badge.svg)](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader/actions/workflows/ci.yml)
+![Android](https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white)
+![iOS](https://img.shields.io/badge/platform-iOS-000000?logo=apple&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Remote-controlled app version management for Flutter, by [Sadique Iqbal](https://github.com/sadiqueiqbal0786).
 
 The plugin asks your version API which release is the **latest** and which is
 the **minimum** an administrator still allows, compares both against the
@@ -44,7 +50,7 @@ PLUGIN         →  UP_TO_DATE | UPDATE_AVAILABLE | UPDATE_REQUIRED | CHECK_FAIL
 
 ```yaml
 dependencies:
-  flutter_app_version_upgrader: ^0.1.0
+  flutter_app_version_upgrader: ^0.2.1
 ```
 
 Android needs `minSdk 24`; iOS needs 15.0.
@@ -237,6 +243,13 @@ The platform code is intentionally small:
 | `readCache` / `writeCache` / `clearCache` | `SharedPreferences` | `UserDefaults` |
 | `openStore` | `market://` then Play web URL | `itms-apps://` then App Store web URL |
 
+## Author
+
+**Sadique Iqbal** · [GitHub](https://github.com/sadiqueiqbal0786) · sadiqueiqbal.si@gmail.com
+
+Issues and pull requests are welcome at the
+[repository](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader).
+
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT © 2026 Sadique Iqbal. See [LICENSE](LICENSE).
