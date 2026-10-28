@@ -237,10 +237,19 @@ class _UpgraderHeroState extends State<UpgraderHero>
   @override
   void initState() {
     super.initState();
-    if (widget.style.animateHero) {
-      // Three breaths, then rest: alive on entry, quiet afterwards (and
-      // finite, so tests and battery are both happy).
-      _pulse.repeat(count: 3);
+    if (widget.style.animateHero) _breathe();
+  }
+
+  /// Three breaths, then rest: alive on entry, quiet afterwards (and
+  /// finite, so tests and battery are both happy). Written as explicit
+  /// runs rather than `repeat(count:)`, which needs Flutter 3.22.
+  Future<void> _breathe() async {
+    try {
+      for (var i = 0; i < 3; i++) {
+        await _pulse.forward(from: 0).orCancel;
+      }
+    } on TickerCanceled {
+      // Disposed mid-animation; nothing to do.
     }
   }
 
