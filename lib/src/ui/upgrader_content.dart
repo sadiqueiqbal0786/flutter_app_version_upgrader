@@ -102,14 +102,12 @@ class _UpgraderContentState extends State<UpgraderContent>
     final s = widget.style;
     final t = widget.texts;
     final r = widget.result;
-    final align = widget.centered
-        ? CrossAxisAlignment.center
-        : CrossAxisAlignment.start;
+    final align =
+        widget.centered ? CrossAxisAlignment.center : CrossAxisAlignment.start;
     final textAlign = widget.centered ? TextAlign.center : TextAlign.start;
     final notes = r.releaseNotes;
-    final versionLine = t.versionLine.isEmpty
-        ? null
-        : UpgraderTexts.fill(t.versionLine, r);
+    final versionLine =
+        t.versionLine.isEmpty ? null : UpgraderTexts.fill(t.versionLine, r);
     var i = 0;
 
     return Column(
@@ -119,11 +117,9 @@ class _UpgraderContentState extends State<UpgraderContent>
         _staggered(
           i++,
           Align(
-            alignment: widget.centered
-                ? Alignment.center
-                : Alignment.centerLeft,
-            child:
-                s.illustration ??
+            alignment:
+                widget.centered ? Alignment.center : Alignment.centerLeft,
+            child: s.illustration ??
                 UpgraderHero(style: s, scale: widget.heroScale),
           ),
         ),
@@ -142,9 +138,8 @@ class _UpgraderContentState extends State<UpgraderContent>
           _staggered(
             i++,
             Align(
-              alignment: widget.centered
-                  ? Alignment.center
-                  : Alignment.centerLeft,
+              alignment:
+                  widget.centered ? Alignment.center : Alignment.centerLeft,
               // Long version strings or large fonts shrink instead of overflowing.
               child: FittedBox(
                 fit: BoxFit.scaleDown,
@@ -272,13 +267,16 @@ class _UpgraderHeroState extends State<UpgraderHero>
             children: [
               _ring(
                 disc * (1.35 + 0.5 * v),
-                accent.withValues(alpha: 0.10 * (1 - v)),
+                accent.withAlpha(
+                    (((0.10 * (1 - v)) * 255).round()).clamp(0, 255)),
               ),
               _ring(
                 disc * (1.2 + 0.25 * v),
-                accent.withValues(alpha: 0.14 * (1 - v * 0.6)),
+                accent.withAlpha(
+                    (((0.14 * (1 - v * 0.6)) * 255).round()).clamp(0, 255)),
               ),
-              _ring(disc * 1.22, accent.withValues(alpha: 0.10)),
+              _ring(disc * 1.22,
+                  accent.withAlpha((((0.10) * 255).round()).clamp(0, 255))),
               child!,
             ],
           );
@@ -295,7 +293,8 @@ class _UpgraderHeroState extends State<UpgraderHero>
             ),
             boxShadow: [
               BoxShadow(
-                color: accent.withValues(alpha: s.isDark ? 0.45 : 0.32),
+                color: accent.withAlpha(
+                    (((s.isDark ? 0.45 : 0.32) * 255).round()).clamp(0, 255)),
                 blurRadius: 28,
                 offset: const Offset(0, 12),
               ),
@@ -308,10 +307,10 @@ class _UpgraderHeroState extends State<UpgraderHero>
   }
 
   Widget _ring(double size, Color color) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-  );
+        width: size,
+        height: size,
+        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+      );
 }
 
 /// "installed → latest" chips.
@@ -333,7 +332,7 @@ class VersionChips extends StatelessWidget {
       children: [
         _chip(
           result.current.toString(),
-          bg: s.muted.withValues(alpha: 0.12),
+          bg: s.muted.withAlpha((((0.12) * 255).round()).clamp(0, 255)),
           fg: s.muted,
         ),
         Padding(
@@ -348,7 +347,8 @@ class VersionChips extends StatelessWidget {
         ),
         _chip(
           result.latest.toString(),
-          bg: s.accent.withValues(alpha: s.isDark ? 0.22 : 0.12),
+          bg: s.accent.withAlpha(
+              (((s.isDark ? 0.22 : 0.12) * 255).round()).clamp(0, 255)),
           fg: s.accent,
           bold: true,
         ),
@@ -361,22 +361,23 @@ class VersionChips extends StatelessWidget {
     required Color bg,
     required Color fg,
     bool bold = false,
-  }) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: BoxDecoration(
-      color: bg,
-      borderRadius: BorderRadius.circular(100),
-    ),
-    child: Text(
-      text,
-      style: TextStyle(
-        color: fg,
-        fontSize: 13,
-        fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
-    ),
-  );
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: fg,
+            fontSize: 13,
+            fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      );
 }
 
 /// Release notes in a soft card.
@@ -411,9 +412,11 @@ class ReleaseNotesCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
-        color: s.muted.withValues(alpha: s.isDark ? 0.12 : 0.07),
+        color: s.muted.withAlpha(
+            (((s.isDark ? 0.12 : 0.07) * 255).round()).clamp(0, 255)),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: s.muted.withValues(alpha: 0.12)),
+        border: Border.all(
+            color: s.muted.withAlpha((((0.12) * 255).round()).clamp(0, 255))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +503,8 @@ class _UpgraderPrimaryButtonState extends State<UpgraderPrimaryButton> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: s.accent.withValues(alpha: 0.35),
+                  color: s.accent
+                      .withAlpha((((0.35) * 255).round()).clamp(0, 255)),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 ),

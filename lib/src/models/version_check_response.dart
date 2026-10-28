@@ -66,16 +66,14 @@ class VersionCheckResponse {
       schemaVersion: schema,
       appId: app?['id'] as String? ?? '',
       platform: app?['platform'] as String? ?? '',
-      channel:
-          VersionChannel.fromWireName(app?['channel'] as String?) ??
+      channel: VersionChannel.fromWireName(app?['channel'] as String?) ??
           VersionChannel.production,
       latest: latest,
       minimum: minimum,
       recommended: VersionInfo.fromJson(_map(json['recommended'])),
       policy: VersionPolicy.fromJson(_map(json['policy'])),
       updateUrl: _nonEmpty(update?['url'] as String?),
-      releaseNotes:
-          _nonEmpty(update?['release_notes'] as String?) ??
+      releaseNotes: _nonEmpty(update?['release_notes'] as String?) ??
           _nonEmpty(json['release_notes'] as String?),
       serverTime: _toDate(json['server_time']),
     );
@@ -132,19 +130,19 @@ class VersionCheckResponse {
 
   /// Serialises back to the wire format (used by the local cache).
   Map<String, dynamic> toJson() => {
-    'schema_version': schemaVersion,
-    'app': {'id': appId, 'platform': platform, 'channel': channel.wireName},
-    'latest': latest.toJson(),
-    'minimum': minimum.toJson(),
-    if (recommended != null) 'recommended': recommended!.toJson(),
-    'policy': policy.toJson(),
-    'update': {
-      if (updateUrl != null) 'url': updateUrl,
-      if (releaseNotes != null) 'release_notes': releaseNotes,
-    },
-    if (serverTime != null)
-      'server_time': serverTime!.toUtc().toIso8601String(),
-  };
+        'schema_version': schemaVersion,
+        'app': {'id': appId, 'platform': platform, 'channel': channel.wireName},
+        'latest': latest.toJson(),
+        'minimum': minimum.toJson(),
+        if (recommended != null) 'recommended': recommended!.toJson(),
+        'policy': policy.toJson(),
+        'update': {
+          if (updateUrl != null) 'url': updateUrl,
+          if (releaseNotes != null) 'release_notes': releaseNotes,
+        },
+        if (serverTime != null)
+          'server_time': serverTime!.toUtc().toIso8601String(),
+      };
 
   @override
   String toString() =>

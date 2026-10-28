@@ -81,6 +81,10 @@ class VersionManagerConfig {
   final String? appId;
 
   /// The release channel this build belongs to.
+  ///
+  /// Keep [VersionChannel.production] for any build that may be promoted to
+  /// a store (a TestFlight build is the binary Apple releases). Use the
+  /// test channels only for builds that never ship.
   final VersionChannel channel;
 
   /// Path of the check endpoint, appended to [baseUrl].
@@ -141,21 +145,22 @@ class VersionManagerConfig {
     String? appStoreId,
     VersionInfo? currentVersionOverride,
     VersionLogger? logger,
-  }) => VersionManagerConfig(
-    baseUrl: baseUrl ?? this.baseUrl,
-    appId: appId ?? this.appId,
-    channel: channel ?? this.channel,
-    checkPath: checkPath ?? this.checkPath,
-    apiKey: apiKey ?? this.apiKey,
-    headers: headers ?? this.headers,
-    timeout: timeout ?? this.timeout,
-    cacheTtl: cacheTtl ?? this.cacheTtl,
-    allowStaleCache: allowStaleCache ?? this.allowStaleCache,
-    failurePolicy: failurePolicy ?? this.failurePolicy,
-    responseValidator: responseValidator ?? this.responseValidator,
-    appStoreId: appStoreId ?? this.appStoreId,
-    currentVersionOverride:
-        currentVersionOverride ?? this.currentVersionOverride,
-    logger: logger ?? this.logger,
-  );
+  }) =>
+      VersionManagerConfig(
+        baseUrl: baseUrl ?? this.baseUrl,
+        appId: appId ?? this.appId,
+        channel: channel ?? this.channel,
+        checkPath: checkPath ?? this.checkPath,
+        apiKey: apiKey ?? this.apiKey,
+        headers: headers ?? this.headers,
+        timeout: timeout ?? this.timeout,
+        cacheTtl: cacheTtl ?? this.cacheTtl,
+        allowStaleCache: allowStaleCache ?? this.allowStaleCache,
+        failurePolicy: failurePolicy ?? this.failurePolicy,
+        responseValidator: responseValidator ?? this.responseValidator,
+        appStoreId: appStoreId ?? this.appStoreId,
+        currentVersionOverride:
+            currentVersionOverride ?? this.currentVersionOverride,
+        logger: logger ?? this.logger,
+      );
 }

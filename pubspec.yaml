@@ -4,7 +4,7 @@ description: >-
   published version, enforces a configurable minimum version policy, caches
   the last known good policy, and returns an update decision without forcing
   any UI.
-version: 0.3.0
+version: 0.3.1
 homepage: https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader
 repository: https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader
 topics:
@@ -15,8 +15,8 @@ topics:
   - play-store
 
 environment:
-  sdk: ^3.13.0
-  flutter: '>=3.3.0'
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.19.0'
 
 dependencies:
   flutter:
@@ -28,7 +28,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^3.0.0
 
 flutter:
   plugin:

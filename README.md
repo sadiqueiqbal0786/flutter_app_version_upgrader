@@ -51,10 +51,10 @@ launch. No store submission, no app rebuild.
 
 ```yaml
 dependencies:
-  flutter_app_version_upgrader: ^0.3.0
+  flutter_app_version_upgrader: ^0.3.1
 ```
 
-Requirements: Flutter 3.3+, Dart 3.13+, Android `minSdk 24`, iOS 15.
+Requirements: Flutter 3.19+ (Dart 3.3+), Android `minSdk 24`, iOS 15.
 Nothing to add to `AndroidManifest.xml` or `Info.plist`.
 
 ### 2. Initialise once, before `runApp`
@@ -208,7 +208,7 @@ Every option of `VersionManagerConfig`:
 |---|---|---|
 | `baseUrl` | required | Base URL of your endpoint (any value when a custom `source` is used) |
 | `appId` | package name / bundle id | Value sent as `app_id` |
-| `channel` | `production` | `production`, `beta`, `alpha`, `internal`. Use `beta` for TestFlight / Play beta builds |
+| `channel` | `production` | `production`, `beta`, `alpha`, `internal`. Keep `production` for anything that may be promoted to a store; see "Choosing the channel" |
 | `checkPath` | `/v1/version/check` | Path appended to `baseUrl` |
 | `apiKey` | none | Sent as `X-Api-Key` |
 | `headers` | `{}` | Extra headers on every request |
@@ -222,11 +222,21 @@ Every option of `VersionManagerConfig`:
 | `currentVersionOverride` | none | Pretend to be another version (debug menus, tests, desktop) |
 | `logger` | none | Receives diagnostic messages |
 
-Pass build-specific values with `--dart-define` so each flavour gets the
-right channel:
+### Choosing the channel
+
+Keep `production` for any build that could ever reach a store. On iOS the
+TestFlight build is the very binary Apple later releases, and on Android a
+test-track bundle is often promoted unchanged; a build compiled with `beta`
+would keep checking the beta track after it went live. A TestFlight build
+on `production` is usually newer than the App Store version and simply
+reports up to date, which is correct.
+
+Use `beta`, `alpha` or `internal` only for builds that will never be
+promoted, for example a nightly for internal testers. Pass it at build
+time so it cannot leak into a store build by accident:
 
 ```sh
-flutter build ipa --dart-define=VERSION_CHANNEL=beta
+flutter build apk --flavor nightly --dart-define=VERSION_CHANNEL=internal
 ```
 
 ```dart
@@ -433,7 +443,7 @@ responseValidator: (body, headers) {
 |---|---|
 | Nothing ever shows | `checkFailed`: the URL is wrong or unreachable. Pass a `logger` and read the messages |
 | Shows "update required" on a fresh install | The server's `minimum` is above the installed version. Check `policy.mode` and the data for that channel |
-| TestFlight build told to update to an App Store version | The build runs with `channel: production`. Use `beta` for TestFlight builds |
+| A build compiled with `beta` keeps asking about the beta track after it shipped | Store builds must use `production`; `beta` is only for builds that are never promoted |
 | `2.10.0` treated as older than `2.9.0` | Your server compares strings. Return proper versions; the plugin compares them correctly |
 | Soft prompt never returns after tapping Skip | That is by design, per version. A newer `latest` shows it again. Call `UpgraderPromptStore(VersionManager.instance.platform).clear()` to reset |
 | iOS opens Safari instead of the App Store | Send `https://apps.apple.com/app/id<ID>` or set `appStoreId` so the `itms-apps` link is used |

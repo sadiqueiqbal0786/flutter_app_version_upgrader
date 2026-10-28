@@ -1,3 +1,11 @@
+## 0.3.1
+
+- Lower the SDK floor to Flutter 3.19 / Dart 3.3 (was Dart 3.13). No
+  behaviour change; `Color.withValues` and null-aware elements replaced with
+  equivalents that compile on older SDKs. CI now also builds on Flutter 3.19.
+- README: channel guidance corrected. Store builds, including TestFlight,
+  keep `production`; `beta` is only for builds that are never promoted.
+
 ## 0.3.0
 
 - `VersionSource`: plug in any policy source (Firebase Remote Config, GraphQL,

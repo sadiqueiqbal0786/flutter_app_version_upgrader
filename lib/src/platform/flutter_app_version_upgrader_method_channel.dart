@@ -44,9 +44,9 @@ class MethodChannelFlutterAppVersionUpgrader
     String? appStoreId,
   }) async {
     final launched = await methodChannel.invokeMethod<bool>('openStore', {
-      'url': ?url,
-      'packageName': ?packageName,
-      'appStoreId': ?appStoreId,
+      if (url != null) 'url': url,
+      if (packageName != null) 'packageName': packageName,
+      if (appStoreId != null) 'appStoreId': appStoreId,
     });
     return launched ?? false;
   }

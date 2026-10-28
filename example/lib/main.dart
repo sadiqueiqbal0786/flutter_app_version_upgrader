@@ -163,25 +163,25 @@ class _StatusBanner extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final (icon, label, color) = switch (result.status) {
       UpdateStatus.upToDate => (
-        Icons.check_circle,
-        'Up to date',
-        scheme.primary,
-      ),
+          Icons.check_circle,
+          'Up to date',
+          scheme.primary,
+        ),
       UpdateStatus.updateAvailable => (
-        Icons.new_releases,
-        'Update available',
-        scheme.tertiary,
-      ),
+          Icons.new_releases,
+          'Update available',
+          scheme.tertiary,
+        ),
       UpdateStatus.updateRequired => (
-        Icons.error,
-        'Update required',
-        scheme.error,
-      ),
+          Icons.error,
+          'Update required',
+          scheme.error,
+        ),
       UpdateStatus.checkFailed => (
-        Icons.cloud_off,
-        'Check failed',
-        scheme.outline,
-      ),
+          Icons.cloud_off,
+          'Check failed',
+          scheme.outline,
+        ),
     };
     return Card(
       child: ListTile(

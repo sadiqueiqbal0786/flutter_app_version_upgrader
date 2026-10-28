@@ -12,11 +12,11 @@ class UpgraderTexts {
     this.requiredTitle = 'Update required',
     this.requiredMessage =
         'This version is no longer supported. Please update to version '
-        '{minimum} or newer to continue.',
+            '{minimum} or newer to continue.',
     this.availableTitle = 'Update available',
     this.availableMessage =
         'Version {latest} is ready. Update now to get the latest '
-        'improvements.',
+            'improvements.',
     this.updateButton = 'Update now',
     this.laterButton = 'Later',
     this.skipButton = 'Skip this version',
@@ -91,17 +91,18 @@ class UpgraderTexts {
     String? releaseNotesTitle,
     String? versionLine,
     bool? useServerMessageForSoftPrompt,
-  }) => UpgraderTexts(
-    requiredTitle: requiredTitle ?? this.requiredTitle,
-    requiredMessage: requiredMessage ?? this.requiredMessage,
-    availableTitle: availableTitle ?? this.availableTitle,
-    availableMessage: availableMessage ?? this.availableMessage,
-    updateButton: updateButton ?? this.updateButton,
-    laterButton: laterButton ?? this.laterButton,
-    skipButton: skipButton ?? this.skipButton,
-    releaseNotesTitle: releaseNotesTitle ?? this.releaseNotesTitle,
-    versionLine: versionLine ?? this.versionLine,
-    useServerMessageForSoftPrompt:
-        useServerMessageForSoftPrompt ?? this.useServerMessageForSoftPrompt,
-  );
+  }) =>
+      UpgraderTexts(
+        requiredTitle: requiredTitle ?? this.requiredTitle,
+        requiredMessage: requiredMessage ?? this.requiredMessage,
+        availableTitle: availableTitle ?? this.availableTitle,
+        availableMessage: availableMessage ?? this.availableMessage,
+        updateButton: updateButton ?? this.updateButton,
+        laterButton: laterButton ?? this.laterButton,
+        skipButton: skipButton ?? this.skipButton,
+        releaseNotesTitle: releaseNotesTitle ?? this.releaseNotesTitle,
+        versionLine: versionLine ?? this.versionLine,
+        useServerMessageForSoftPrompt:
+            useServerMessageForSoftPrompt ?? this.useServerMessageForSoftPrompt,
+      );
 }

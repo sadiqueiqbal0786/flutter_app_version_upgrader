@@ -46,9 +46,9 @@ class VersionInfo implements Comparable<VersionInfo> {
 
   /// Serialises to the wire format used by the version API.
   Map<String, dynamic> toJson() => {
-    'version': version.toString(),
-    if (build != null) 'build': build,
-  };
+        'version': version.toString(),
+        if (build != null) 'build': build,
+      };
 
   @override
   int compareTo(VersionInfo other) {

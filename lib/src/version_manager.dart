@@ -59,10 +59,9 @@ class VersionManager {
     VersionSource? source,
     @Deprecated('Use source') VersionApiClient? apiClient,
     DateTime Function()? clock,
-  }) : _platform = platform ?? _defaultPlatform(),
-       _clock = clock ?? _utcNow {
-    _api =
-        source ??
+  })  : _platform = platform ?? _defaultPlatform(),
+        _clock = clock ?? _utcNow {
+    _api = source ??
         // ignore: deprecated_member_use_from_same_package
         apiClient ??
         VersionApiClient(config: config, httpClient: httpClient);
@@ -83,8 +82,8 @@ class VersionManager {
 
   static FlutterAppVersionUpgraderPlatform _defaultPlatform() =>
       isPlatformSupported
-      ? FlutterAppVersionUpgraderPlatform.instance
-      : InMemoryFlutterAppVersionUpgraderPlatform();
+          ? FlutterAppVersionUpgraderPlatform.instance
+          : InMemoryFlutterAppVersionUpgraderPlatform();
 
   /// The configuration in effect.
   final VersionManagerConfig config;

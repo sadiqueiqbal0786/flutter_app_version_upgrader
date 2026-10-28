@@ -165,7 +165,8 @@ class _UpdateAvailablePromptState extends State<UpdateAvailablePrompt>
                                   height: 4,
                                   margin: const EdgeInsets.only(bottom: 16),
                                   decoration: BoxDecoration(
-                                    color: s.muted.withValues(alpha: 0.4),
+                                    color: s.muted.withAlpha(
+                                        (((0.4) * 255).round()).clamp(0, 255)),
                                     borderRadius: BorderRadius.circular(2),
                                   ),
                                 ),
@@ -241,8 +242,9 @@ class _GlowSurface extends StatelessWidget {
             center: const Alignment(0, -1.1),
             radius: 1.1,
             colors: [
-              style.accent.withValues(alpha: style.isDark ? 0.22 : 0.13),
-              style.background.withValues(alpha: 0),
+              style.accent.withAlpha(
+                  (((style.isDark ? 0.22 : 0.13) * 255).round()).clamp(0, 255)),
+              style.background.withAlpha((((0) * 255).round()).clamp(0, 255)),
             ],
           ),
         ),

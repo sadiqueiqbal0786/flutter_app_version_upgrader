@@ -51,9 +51,9 @@ class CachedPolicy {
 
   /// Serialises the envelope.
   Map<String, dynamic> toJson() => {
-    'cache_version': 1,
-    'response': response.toJson(),
-    'received_at': receivedAt.toUtc().toIso8601String(),
-    'expires_at': expiresAt.toUtc().toIso8601String(),
-  };
+        'cache_version': 1,
+        'response': response.toJson(),
+        'received_at': receivedAt.toUtc().toIso8601String(),
+        'expires_at': expiresAt.toUtc().toIso8601String(),
+      };
 }

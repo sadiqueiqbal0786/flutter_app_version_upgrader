@@ -24,8 +24,7 @@ class VersionApiException implements Exception {
   final Object? cause;
 
   @override
-  String toString() =>
-      'VersionApiException: $message'
+  String toString() => 'VersionApiException: $message'
       '${statusCode == null ? '' : ' (HTTP $statusCode)'}';
 }
 
@@ -41,8 +40,8 @@ class VersionApiException implements Exception {
 class VersionApiClient implements VersionSource {
   /// Creates a [VersionApiClient].
   VersionApiClient({required this.config, http.Client? httpClient})
-    : _http = httpClient ?? http.Client(),
-      _ownsClient = httpClient == null;
+      : _http = httpClient ?? http.Client(),
+        _ownsClient = httpClient == null;
 
   /// The configuration in effect.
   final VersionManagerConfig config;

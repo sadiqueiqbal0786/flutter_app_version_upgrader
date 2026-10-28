@@ -27,18 +27,18 @@ void main() {
   VersionManager manager({
     VersionManagerConfig config = baseConfig,
     required MockClientHandler handler,
-  }) => VersionManager(
-    config,
-    platform: platform,
-    httpClient: MockClient(handler),
-    clock: () => now,
-  );
+  }) =>
+      VersionManager(
+        config,
+        platform: platform,
+        httpClient: MockClient(handler),
+        clock: () => now,
+      );
 
   MockClientHandler ok(Map<String, dynamic> body) =>
       (_) async => http.Response(jsonEncode(body), 200);
 
-  MockClientHandler down() =>
-      (_) async => http.Response('', 503);
+  MockClientHandler down() => (_) async => http.Response('', 503);
 
   final customBody = sampleBody(minimum: {'version': '2.5.0', 'build': 250});
 
@@ -131,7 +131,8 @@ void main() {
     });
 
     test('corrupt cache behaves like no cache', () async {
-      platform.store['flutter_app_version_upgrader.policy.com.example.app.android.production'] =
+      platform.store[
+              'flutter_app_version_upgrader.policy.com.example.app.android.production'] =
           '{not json';
       final result = await manager(handler: down()).checkVersion();
       expect(result.status, UpdateStatus.checkFailed);
@@ -139,8 +140,8 @@ void main() {
 
     test('an unusable response falls back to cache', () async {
       await manager(handler: ok(customBody)).checkVersion();
-      final result = await manager(handler: ok({'schema_version': 99}))
-          .checkVersion();
+      final result =
+          await manager(handler: ok({'schema_version': 99})).checkVersion();
       expect(result.source, CheckSource.cache);
     });
 
@@ -422,7 +423,7 @@ void _sourceTests() {
         final m = VersionManager(
           VersionManagerConfig(
             baseUrl: 'https://legacy.example.com',
-            responseParser: (json) => throw FormatException('nope'),
+            responseParser: (json) => throw const FormatException('nope'),
           ),
           platform: platform,
           httpClient: MockClient((_) async => http.Response('{}', 200)),

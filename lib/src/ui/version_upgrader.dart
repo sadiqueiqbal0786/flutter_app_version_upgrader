@@ -193,8 +193,7 @@ class VersionUpgraderState extends State<VersionUpgrader>
   }
 
   void _bind() {
-    _manager =
-        widget.manager ??
+    _manager = widget.manager ??
         (VersionManager.isInitialized ? VersionManager.instance : null);
     final m = _manager;
     if (m == null) return;

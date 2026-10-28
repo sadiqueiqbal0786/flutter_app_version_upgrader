@@ -84,11 +84,11 @@ class VersionPolicy {
 
   /// Serialises to the wire format.
   Map<String, dynamic> toJson() => {
-    'mode': mode.wireName,
-    'force_update': forceUpdate,
-    'enabled': enabled,
-    if (updateMessage != null) 'update_message': updateMessage,
-  };
+        'mode': mode.wireName,
+        'force_update': forceUpdate,
+        'enabled': enabled,
+        if (updateMessage != null) 'update_message': updateMessage,
+      };
 
   @override
   bool operator ==(Object other) =>

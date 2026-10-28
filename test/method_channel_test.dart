@@ -15,29 +15,29 @@ void main() {
     store.clear();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
-          calls.add(call);
-          final args = (call.arguments as Map?)?.cast<String, Object?>() ?? {};
-          switch (call.method) {
-            case 'getAppInfo':
-              return {
-                'packageName': 'com.example.app',
-                'versionName': '1.2.3',
-                'buildNumber': 42,
-                'platform': 'android',
-              };
-            case 'readCache':
-              return store[args['key']];
-            case 'writeCache':
-              store[args['key']! as String] = args['value']! as String;
-              return null;
-            case 'clearCache':
-              store.remove(args['key']);
-              return null;
-            case 'openStore':
-              return true;
-          }
+      calls.add(call);
+      final args = (call.arguments as Map?)?.cast<String, Object?>() ?? {};
+      switch (call.method) {
+        case 'getAppInfo':
+          return {
+            'packageName': 'com.example.app',
+            'versionName': '1.2.3',
+            'buildNumber': 42,
+            'platform': 'android',
+          };
+        case 'readCache':
+          return store[args['key']];
+        case 'writeCache':
+          store[args['key']! as String] = args['value']! as String;
           return null;
-        });
+        case 'clearCache':
+          store.remove(args['key']);
+          return null;
+        case 'openStore':
+          return true;
+      }
+      return null;
+    });
   });
 
   tearDown(() {
@@ -57,13 +57,13 @@ void main() {
   test('getAppInfo accepts a string build number', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
-          return {
-            'packageName': 'com.example.app',
-            'versionName': '1.2.3',
-            'buildNumber': '7',
-            'platform': 'ios',
-          };
-        });
+      return {
+        'packageName': 'com.example.app',
+        'versionName': '1.2.3',
+        'buildNumber': '7',
+        'platform': 'ios',
+      };
+    });
     expect((await platform.getAppInfo()).buildNumber, 7);
   });
 

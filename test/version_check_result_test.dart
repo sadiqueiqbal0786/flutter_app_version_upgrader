@@ -7,22 +7,23 @@ VersionCheckResponse response({
   String? recommended,
   bool forceUpdate = true,
   bool enabled = true,
-}) => VersionCheckResponse(
-  schemaVersion: 1,
-  appId: 'com.example.app',
-  platform: 'android',
-  channel: VersionChannel.production,
-  latest: VersionInfo.parse(latest),
-  minimum: VersionInfo.parse(minimum),
-  recommended: recommended == null ? null : VersionInfo.parse(recommended),
-  policy: VersionPolicy(
-    mode: PolicyMode.custom,
-    forceUpdate: forceUpdate,
-    enabled: enabled,
-    updateMessage: 'Update please',
-  ),
-  updateUrl: 'https://example.com/update',
-);
+}) =>
+    VersionCheckResponse(
+      schemaVersion: 1,
+      appId: 'com.example.app',
+      platform: 'android',
+      channel: VersionChannel.production,
+      latest: VersionInfo.parse(latest),
+      minimum: VersionInfo.parse(minimum),
+      recommended: recommended == null ? null : VersionInfo.parse(recommended),
+      policy: VersionPolicy(
+        mode: PolicyMode.custom,
+        forceUpdate: forceUpdate,
+        enabled: enabled,
+        updateMessage: 'Update please',
+      ),
+      updateUrl: 'https://example.com/update',
+    );
 
 VersionCheckResult evaluate(String current, VersionCheckResponse r) =>
     VersionCheckResult.evaluate(

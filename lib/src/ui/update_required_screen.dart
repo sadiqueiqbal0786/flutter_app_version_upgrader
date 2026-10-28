@@ -50,8 +50,9 @@ class UpdateRequiredScreen extends StatelessWidget {
               center: const Alignment(0, -0.9),
               radius: 1.2,
               colors: [
-                s.accent.withValues(alpha: s.isDark ? 0.26 : 0.16),
-                s.background.withValues(alpha: 0),
+                s.accent.withAlpha(
+                    (((s.isDark ? 0.26 : 0.16) * 255).round()).clamp(0, 255)),
+                s.background.withAlpha((((0) * 255).round()).clamp(0, 255)),
               ],
             ),
           ),
@@ -73,7 +74,7 @@ class UpdateRequiredScreen extends StatelessWidget {
                         : texts.requiredTitle,
                     message: failed
                         ? 'The version service could not be reached. '
-                              'Please check your connection and try again.'
+                            'Please check your connection and try again.'
                         : texts.resolveRequiredMessage(result),
                     onUpdate: failed ? (onRetry ?? onUpdate) : onUpdate,
                   ),

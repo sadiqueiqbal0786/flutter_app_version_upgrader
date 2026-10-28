@@ -31,15 +31,20 @@ void main() {
     bool force = true,
     String? notes,
     String? recommended,
-  }) => sampleBody(minimum: {'version': minimum, 'build': 250})
-    ..['latest'] = {'version': latest, 'build': 270}
-    ..['policy'] = {
-      'mode': 'custom',
-      'force_update': force,
-      'update_message': 'Admin says update.',
-    }
-    ..['update'] = {'url': 'https://example.com/store', 'release_notes': ?notes}
-    ..['recommended'] = recommended == null ? null : {'version': recommended};
+  }) =>
+      sampleBody(minimum: {'version': minimum, 'build': 250})
+        ..['latest'] = {'version': latest, 'build': 270}
+        ..['policy'] = {
+          'mode': 'custom',
+          'force_update': force,
+          'update_message': 'Admin says update.',
+        }
+        ..['update'] = {
+          'url': 'https://example.com/store',
+          if (notes != null) 'release_notes': notes
+        }
+        ..['recommended'] =
+            recommended == null ? null : {'version': recommended};
 
   Widget app(
     VersionManager m, {
@@ -49,19 +54,20 @@ void main() {
     RequiredUpdateBuilder? requiredBuilder,
     AvailableUpdateBuilder? availableBuilder,
     TargetPlatform? targetPlatform,
-  }) => MaterialApp(
-    theme: ThemeData(platform: targetPlatform),
-    builder: (context, child) => VersionUpgrader(
-      manager: m,
-      options: options,
-      style: style,
-      texts: texts,
-      requiredBuilder: requiredBuilder,
-      availableBuilder: availableBuilder,
-      child: child!,
-    ),
-    home: const Scaffold(body: Text('HOME')),
-  );
+  }) =>
+      MaterialApp(
+        theme: ThemeData(platform: targetPlatform),
+        builder: (context, child) => VersionUpgrader(
+          manager: m,
+          options: options,
+          style: style,
+          texts: texts,
+          requiredBuilder: requiredBuilder,
+          availableBuilder: availableBuilder,
+          child: child!,
+        ),
+        home: const Scaffold(body: Text('HOME')),
+      );
 
   group('VersionUpgrader', () {
     testWidgets('blocks with the admin message when an update is required', (
@@ -277,14 +283,14 @@ void main() {
           managerFor(body()),
           availableBuilder: (context, result, onUpdate, onLater, onSkip) =>
               Align(
-                alignment: Alignment.bottomCenter,
-                child: Material(
-                  child: TextButton(
-                    onPressed: onSkip,
-                    child: const Text('CUSTOM SKIP'),
-                  ),
-                ),
+            alignment: Alignment.bottomCenter,
+            child: Material(
+              child: TextButton(
+                onPressed: onSkip,
+                child: const Text('CUSTOM SKIP'),
               ),
+            ),
+          ),
         ),
       );
       await tester.pumpAndSettle();
