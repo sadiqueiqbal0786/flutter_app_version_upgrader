@@ -1,5 +1,4 @@
 # Without a git checkout pub does not read .gitignore, so list everything here.
-backend/
 **/build/
 **/.dart_tool/
 **/.idea/

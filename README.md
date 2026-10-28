@@ -51,7 +51,7 @@ launch. No store submission, no app rebuild.
 
 ```yaml
 dependencies:
-  flutter_app_version_upgrader: ^0.2.2
+  flutter_app_version_upgrader: ^0.2.3
 ```
 
 Requirements: Flutter 3.3+, Dart 3.13+, Android `minSdk 24`, iOS 15.
@@ -125,7 +125,7 @@ Pick whichever of these suits you:
 | Option | Effort | You get |
 |---|---|---|
 | **A. Static JSON file** on any host (Firebase Hosting, S3, GitHub Pages, your API) | Minutes | Remote-controlled minimum and latest. You edit the file when you release. Set `checkPath` to the file's path. |
-| **B. Reference backend** in this repo's [`backend/`](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader/tree/main/backend) | An afternoon | Latest discovered automatically from Google Play, App Store and TestFlight, age-based minimum, admin dashboard, installed-version stats. Nothing to do per release. |
+| **B. Reference backend**, a separate project: [flutter_app_version_upgrader_backend](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader_backend) | An afternoon | Latest discovered automatically from Google Play, App Store and TestFlight, age-based minimum, admin dashboard, installed-version stats. Nothing to do per release. |
 | **C. Your own API** | Depends | Return the JSON above from an endpoint you already run. |
 
 For option A with a static file:
@@ -337,7 +337,7 @@ runtime.
   version, platform and channel.
 - Use HTTPS. Add an `X-Api-Key` with `apiKey`, or any header with `headers`.
 - To verify signed responses, implement `responseValidator`. The reference
-  backend signs with HMAC-SHA256 over `"<timestamp>.<body>"` in the
+  backend, for example, signs with HMAC-SHA256 over `"<timestamp>.<body>"` in the
   `X-Signature` header:
 
 ```dart
@@ -376,12 +376,11 @@ responseValidator: (body, headers) {
 
 ## Reference backend
 
-[`backend/`](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader/tree/main/backend)
-is a FastAPI service that polls Google Play, App Store Connect and
-TestFlight, stores releases, applies `auto_latest` / `custom` / `age_based`
-policies, serves the endpoint above, and ships an admin dashboard. It is
-optional, not part of this package, and documented in its own README,
-including the exact credentials to provide and a Docker Compose setup.
+[flutter_app_version_upgrader_backend](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader_backend) is a separate, optional
+FastAPI service that polls Google Play, App Store Connect and TestFlight,
+stores releases, applies `auto_latest` / `custom` / `age_based` policies,
+serves the endpoint above and ships an admin dashboard. It is not part of
+this package; use it, a static file, or your own API.
 
 ## Author
 

@@ -1,3 +1,9 @@
+## 0.2.3
+
+- The reference backend moved to its own repository
+  (flutter_app_version_upgrader_backend). This package now contains only the
+  plugin. No code changes.
+
 ## 0.2.2
 
 - README rewritten as a step-by-step guide: quick start, endpoint options,

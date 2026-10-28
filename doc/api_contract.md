@@ -1,7 +1,8 @@
 # Version API contract (schema version 1)
 
-The plugin needs exactly one endpoint. Everything else (store aggregation,
-policy engine, admin dashboard, release database) is backend-internal.
+The plugin needs exactly one endpoint. Anything that serves this JSON works:
+a static file, your own API, or the separate reference implementation
+[flutter_app_version_upgrader_backend](https://github.com/sadiqueiqbal0786/flutter_app_version_upgrader_backend).
 
 ## Request
 
