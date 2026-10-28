@@ -1,3 +1,12 @@
+## 0.3.0
+
+- `VersionSource`: plug in any policy source (Firebase Remote Config, GraphQL,
+  a bundled file) via `VersionManager.initialize(..., source: ...)`.
+- `VersionManagerConfig.responseParser`: map a custom JSON shape while
+  keeping the built-in HTTP client.
+- `VersionApiClient.fetch` now takes a `VersionCheckRequest`; the `apiClient`
+  constructor parameter is deprecated in favour of `source`.
+
 ## 0.2.3
 
 - The reference backend moved to its own repository

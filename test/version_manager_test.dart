@@ -9,6 +9,7 @@ import 'fake_platform.dart';
 import 'version_check_response_test.dart' show sampleBody;
 
 void main() {
+  _sourceTests();
   late FakePlatform platform;
   final t0 = DateTime.utc(2026, 10, 27, 5);
   DateTime now = t0;
@@ -301,5 +302,135 @@ void main() {
       await VersionManager.clearCache();
       expect(platform.store, isEmpty);
     });
+  });
+}
+
+void _sourceTests() {
+  group('Bring your own source', () {
+    late FakePlatform platform;
+    setUp(() => platform = FakePlatform());
+
+    test('a custom VersionSource replaces HTTP entirely', () async {
+      VersionCheckRequest? seen;
+      final m = VersionManager(
+        const VersionManagerConfig(baseUrl: 'unused://'),
+        platform: platform,
+        source: VersionSource.fromCallback((request) async {
+          seen = request;
+          return VersionCheckResponse(
+            schemaVersion: 1,
+            appId: request.appId,
+            platform: request.platform,
+            channel: request.channel,
+            latest: VersionInfo.parse('9.0.0'),
+            minimum: VersionInfo.parse('9.0.0'),
+            policy: const VersionPolicy(
+              mode: PolicyMode.custom,
+              forceUpdate: true,
+            ),
+            updateUrl: 'https://example.com/get',
+          );
+        }),
+      );
+      final result = await m.checkVersion();
+      expect(seen!.appId, 'com.example.app');
+      expect(seen!.current, VersionInfo.parse('2.4.1', build: 241));
+      expect(result.status, UpdateStatus.updateRequired);
+      expect(result.updateUrl, 'https://example.com/get');
+      expect(result.source, CheckSource.network);
+    });
+
+    test(
+      'a failing custom source falls back to cache and fails open',
+      () async {
+        final ok = VersionManager(
+          const VersionManagerConfig(baseUrl: 'unused://'),
+          platform: platform,
+          source: VersionSource.fromCallback(
+            (r) async => VersionCheckResponse(
+              schemaVersion: 1,
+              appId: r.appId,
+              platform: r.platform,
+              channel: r.channel,
+              latest: VersionInfo.parse('3.0.0'),
+              minimum: VersionInfo.parse('1.0.0'),
+              policy: const VersionPolicy(
+                mode: PolicyMode.custom,
+                forceUpdate: true,
+              ),
+            ),
+          ),
+        );
+        await ok.checkVersion();
+        final broken = VersionManager(
+          const VersionManagerConfig(baseUrl: 'unused://'),
+          platform: platform,
+          source: VersionSource.fromCallback(
+            (_) async => throw StateError('boom'),
+          ),
+        );
+        final cached = await broken.checkVersion();
+        expect(cached.source, CheckSource.cache);
+        expect(cached.status, UpdateStatus.updateAvailable);
+      },
+    );
+
+    test('responseParser maps a foreign JSON shape', () async {
+      final m = VersionManager(
+        VersionManagerConfig(
+          baseUrl: 'https://legacy.example.com',
+          checkPath: '/app/config',
+          responseParser: (json) => VersionCheckResponse(
+            schemaVersion: 1,
+            appId: 'com.example.app',
+            platform: 'android',
+            channel: VersionChannel.production,
+            latest: VersionInfo.parse(json['latestVersion'] as String),
+            minimum: VersionInfo.parse(json['minSupportedVersion'] as String),
+            policy: VersionPolicy(
+              mode: PolicyMode.custom,
+              forceUpdate: json['force'] == true,
+            ),
+            updateUrl: json['storeLink'] as String?,
+          ),
+        ),
+        platform: platform,
+        httpClient: MockClient((req) async {
+          expect(req.url.path, '/app/config');
+          return http.Response(
+            jsonEncode({
+              'latestVersion': '2.9.0',
+              'minSupportedVersion': '2.5.0',
+              'force': true,
+              'storeLink': 'https://x/y',
+            }),
+            200,
+          );
+        }),
+      );
+      final r = await m.checkVersion();
+      // Installed 2.4.1 is below the mapped minimum 2.5.0 with force on.
+      expect(r.status, UpdateStatus.updateRequired);
+      expect(r.latest, VersionInfo.parse('2.9.0'));
+      expect(r.minimum, VersionInfo.parse('2.5.0'));
+      expect(r.updateUrl, 'https://x/y');
+    });
+
+    test(
+      'a throwing responseParser is a response failure, not a crash',
+      () async {
+        final m = VersionManager(
+          VersionManagerConfig(
+            baseUrl: 'https://legacy.example.com',
+            responseParser: (json) => throw FormatException('nope'),
+          ),
+          platform: platform,
+          httpClient: MockClient((_) async => http.Response('{}', 200)),
+        );
+        final r = await m.checkVersion();
+        expect(r.status, UpdateStatus.checkFailed);
+        expect(r.error, isA<VersionResponseException>());
+      },
+    );
   });
 }

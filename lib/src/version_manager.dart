@@ -13,6 +13,7 @@ import 'platform/in_memory_platform.dart';
 import 'services/policy_cache_service.dart';
 import 'services/store_launcher.dart';
 import 'services/version_api_client.dart';
+import 'services/version_source.dart';
 import 'version_manager_config.dart';
 
 /// Entry point of the plugin.
@@ -48,16 +49,23 @@ import 'version_manager_config.dart';
 ///    the app is decided by [VersionManagerConfig.failurePolicy].
 class VersionManager {
   /// Creates a [VersionManager] with explicit dependencies.
+  ///
+  /// [source] replaces the HTTP client entirely; see [VersionSource]. When
+  /// omitted, [VersionApiClient] talks to `config.baseUrl`.
   VersionManager(
     this.config, {
     FlutterAppVersionUpgraderPlatform? platform,
     http.Client? httpClient,
-    VersionApiClient? apiClient,
+    VersionSource? source,
+    @Deprecated('Use source') VersionApiClient? apiClient,
     DateTime Function()? clock,
   }) : _platform = platform ?? _defaultPlatform(),
        _clock = clock ?? _utcNow {
     _api =
-        apiClient ?? VersionApiClient(config: config, httpClient: httpClient);
+        source ??
+        // ignore: deprecated_member_use_from_same_package
+        apiClient ??
+        VersionApiClient(config: config, httpClient: httpClient);
     _cache = PolicyCacheService(_platform);
     _store = StoreLauncher(_platform);
   }
@@ -83,7 +91,7 @@ class VersionManager {
 
   final FlutterAppVersionUpgraderPlatform _platform;
   final DateTime Function() _clock;
-  late final VersionApiClient _api;
+  late final VersionSource _api;
   late final PolicyCacheService _cache;
   late final StoreLauncher _store;
 
@@ -135,9 +143,14 @@ class VersionManager {
   static Future<VersionManager> initialize(
     VersionManagerConfig config, {
     http.Client? httpClient,
+    VersionSource? source,
   }) async {
     _instance?.dispose();
-    final manager = VersionManager(config, httpClient: httpClient);
+    final manager = VersionManager(
+      config,
+      httpClient: httpClient,
+      source: source,
+    );
     _instance = manager;
     try {
       await manager.loadAppInfo();
@@ -258,10 +271,12 @@ class VersionManager {
     Object? failure;
     try {
       final response = await _api.fetch(
-        appId: appId,
-        platform: appInfo.platform,
-        channel: config.channel,
-        current: current,
+        VersionCheckRequest(
+          appId: appId,
+          platform: appInfo.platform,
+          channel: config.channel,
+          current: current,
+        ),
       );
       await _writeCache(
         key,

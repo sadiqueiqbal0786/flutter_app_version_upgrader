@@ -22,5 +22,6 @@ export 'src/platform/in_memory_platform.dart';
 export 'src/services/policy_cache_service.dart';
 export 'src/services/store_launcher.dart';
 export 'src/services/version_api_client.dart';
+export 'src/services/version_source.dart';
 export 'src/version_manager.dart';
 export 'src/version_manager_config.dart';

@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 
 import 'models/version_channel.dart';
+import 'models/version_check_response.dart';
 import 'models/version_info.dart';
 
 /// What `VersionManager.check()` reports when neither the API nor the cache
@@ -29,6 +30,26 @@ typedef ResponseValidator = bool Function(
 /// Receives diagnostic messages from the plugin.
 typedef VersionLogger = void Function(String message, [Object? error]);
 
+/// Maps an arbitrary JSON body from your endpoint to a [VersionCheckResponse].
+///
+/// Use this when your server already exists and returns its own shape:
+///
+/// ```dart
+/// responseParser: (json) => VersionCheckResponse(
+///   schemaVersion: 1,
+///   appId: 'com.example.app',
+///   platform: 'android',
+///   channel: VersionChannel.production,
+///   latest: VersionInfo.parse(json['latestVersion'] as String),
+///   minimum: VersionInfo.parse(json['minSupportedVersion'] as String),
+///   policy: VersionPolicy(mode: PolicyMode.custom, forceUpdate: json['force'] == true),
+///   updateUrl: json['storeLink'] as String?,
+/// ),
+/// ```
+typedef ResponseParser = VersionCheckResponse Function(
+  Map<String, dynamic> json,
+);
+
 /// Configuration for `VersionManager`.
 @immutable
 class VersionManagerConfig {
@@ -45,6 +66,7 @@ class VersionManagerConfig {
     this.allowStaleCache = true,
     this.failurePolicy = FailurePolicy.open,
     this.responseValidator,
+    this.responseParser,
     this.appStoreId,
     this.currentVersionOverride,
     this.logger,
@@ -88,6 +110,10 @@ class VersionManagerConfig {
   /// Optional response integrity check (e.g. signature verification).
   final ResponseValidator? responseValidator;
 
+  /// Optional mapping from your endpoint's JSON to the plugin's model. When
+  /// unset, the documented contract is expected.
+  final ResponseParser? responseParser;
+
   /// The numeric App Store id, used as a fallback store link on iOS when the
   /// backend does not supply `update.url`.
   final String? appStoreId;
@@ -111,6 +137,7 @@ class VersionManagerConfig {
     bool? allowStaleCache,
     FailurePolicy? failurePolicy,
     ResponseValidator? responseValidator,
+    ResponseParser? responseParser,
     String? appStoreId,
     VersionInfo? currentVersionOverride,
     VersionLogger? logger,

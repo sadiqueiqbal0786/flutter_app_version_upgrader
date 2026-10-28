@@ -7,6 +7,7 @@ import '../models/version_channel.dart';
 import '../models/version_check_response.dart';
 import '../models/version_info.dart';
 import '../version_manager_config.dart';
+import 'version_source.dart';
 
 /// Thrown when the version API cannot be reached or returns an error.
 class VersionApiException implements Exception {
@@ -28,11 +29,16 @@ class VersionApiException implements Exception {
       '${statusCode == null ? '' : ' (HTTP $statusCode)'}';
 }
 
-/// Talks to `GET /v1/version/check`.
+/// The default [VersionSource]: talks to `GET /v1/version/check` over HTTP.
 ///
 /// The client sends only public information: app id, platform, channel and
 /// the installed version. Store credentials never leave the backend.
-class VersionApiClient {
+///
+/// If your endpoint returns a different JSON shape, keep this client and
+/// supply [VersionManagerConfig.responseParser] to map your payload to a
+/// [VersionCheckResponse]. If it is not HTTP at all, implement
+/// [VersionSource] instead.
+class VersionApiClient implements VersionSource {
   /// Creates a [VersionApiClient].
   VersionApiClient({required this.config, http.Client? httpClient})
     : _http = httpClient ?? http.Client(),
@@ -72,16 +78,16 @@ class VersionApiClient {
     return '$left$right';
   }
 
-  /// Fetches and parses the version policy for the installed app.
+  /// Fetches and parses the version policy for [request].
   ///
   /// Throws [VersionApiException] on transport or HTTP errors and
   /// [VersionResponseException] on an unusable body.
-  Future<VersionCheckResponse> fetch({
-    required String appId,
-    required String platform,
-    required VersionChannel channel,
-    required VersionInfo current,
-  }) async {
+  @override
+  Future<VersionCheckResponse> fetch(VersionCheckRequest request) async {
+    final appId = request.appId;
+    final platform = request.platform;
+    final channel = request.channel;
+    final current = request.current;
     final uri = buildUri(
       appId: appId,
       platform: platform,
@@ -132,10 +138,22 @@ class VersionApiClient {
     if (decoded is! Map) {
       throw const VersionResponseException('Body is not a JSON object');
     }
-    return VersionCheckResponse.fromJson(Map<String, dynamic>.from(decoded));
+    final json = Map<String, dynamic>.from(decoded);
+    final parser = config.responseParser;
+    if (parser != null) {
+      try {
+        return parser(json);
+      } on VersionResponseException {
+        rethrow;
+      } on Object catch (e) {
+        throw VersionResponseException('responseParser failed: $e');
+      }
+    }
+    return VersionCheckResponse.fromJson(json);
   }
 
   /// Releases the underlying HTTP client if this instance created it.
+  @override
   void close() {
     if (_ownsClient) _http.close();
   }

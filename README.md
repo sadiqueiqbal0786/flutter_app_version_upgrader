@@ -51,7 +51,7 @@ launch. No store submission, no app rebuild.
 
 ```yaml
 dependencies:
-  flutter_app_version_upgrader: ^0.2.3
+  flutter_app_version_upgrader: ^0.3.0
 ```
 
 Requirements: Flutter 3.3+, Dart 3.13+, Android `minSdk 24`, iOS 15.
@@ -137,13 +137,76 @@ VersionManagerConfig(
 )
 ```
 
+## Bring your own server
+
+The plugin never depends on any particular backend. Three levels of
+freedom, from least to most code:
+
+**Same JSON, any host.** Return the contract above from anything: a static
+file, a Lambda, a route in your existing API. No plugin code beyond
+`baseUrl` and `checkPath`.
+
+**Your JSON shape, same HTTP client.** Already have an endpoint that says
+`{"latestVersion": "2.9.0", "minSupportedVersion": "2.5.0", ...}`? Map it:
+
+```dart
+VersionManagerConfig(
+  baseUrl: 'https://api.example.com',
+  checkPath: '/mobile/app-config',
+  responseParser: (json) => VersionCheckResponse(
+    schemaVersion: 1,
+    appId: 'com.example.app',
+    platform: 'android',
+    channel: VersionChannel.production,
+    latest: VersionInfo.parse(json['latestVersion'] as String),
+    minimum: VersionInfo.parse(json['minSupportedVersion'] as String),
+    policy: VersionPolicy(mode: PolicyMode.custom, forceUpdate: json['force'] == true),
+    updateUrl: json['storeLink'] as String?,
+    releaseNotes: json['notes'] as String?,
+  ),
+)
+```
+
+**Not HTTP at all.** Implement `VersionSource` and hand it to
+`initialize`. Firebase Remote Config, GraphQL, gRPC, a bundled config file,
+anything:
+
+```dart
+class RemoteConfigSource implements VersionSource {
+  @override
+  Future<VersionCheckResponse> fetch(VersionCheckRequest request) async {
+    final rc = FirebaseRemoteConfig.instance;
+    await rc.fetchAndActivate();
+    return VersionCheckResponse(
+      schemaVersion: 1,
+      appId: request.appId,
+      platform: request.platform,
+      channel: request.channel,
+      latest: VersionInfo.parse(rc.getString('latest_version')),
+      minimum: VersionInfo.parse(rc.getString('min_version')),
+      policy: VersionPolicy(mode: PolicyMode.custom, forceUpdate: rc.getBool('force_update')),
+      updateUrl: rc.getString('store_url'),
+    );
+  }
+}
+
+await VersionManager.initialize(
+  const VersionManagerConfig(baseUrl: 'unused'),
+  source: RemoteConfigSource(),
+);
+```
+
+`VersionSource.fromCallback((request) async => ...)` does the same without
+a class. Whatever the source, the plugin still handles caching, fail-open,
+comparison, skip and snooze, and the UI.
+
 ## Configuration reference
 
 Every option of `VersionManagerConfig`:
 
 | Option | Default | What it does |
 |---|---|---|
-| `baseUrl` | required | Base URL of your endpoint |
+| `baseUrl` | required | Base URL of your endpoint (any value when a custom `source` is used) |
 | `appId` | package name / bundle id | Value sent as `app_id` |
 | `channel` | `production` | `production`, `beta`, `alpha`, `internal`. Use `beta` for TestFlight / Play beta builds |
 | `checkPath` | `/v1/version/check` | Path appended to `baseUrl` |
@@ -154,6 +217,7 @@ Every option of `VersionManagerConfig`:
 | `allowStaleCache` | `true` | When the endpoint is down, reuse an expired cache rather than fail |
 | `failurePolicy` | `open` | `open` lets the app run when nothing is known; `closed` blocks |
 | `responseValidator` | none | Callback to verify a signature before trusting a response |
+| `responseParser` | none | Map your own JSON shape to the plugin's model |
 | `appStoreId` | none | Numeric App Store id, fallback link on iOS when the server sends no `update.url` |
 | `currentVersionOverride` | none | Pretend to be another version (debug menus, tests, desktop) |
 | `logger` | none | Receives diagnostic messages |

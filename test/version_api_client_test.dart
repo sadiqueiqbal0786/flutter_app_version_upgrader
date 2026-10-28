@@ -27,10 +27,12 @@ void main() {
       );
 
       await client.fetch(
-        appId: 'com.example.app',
-        platform: 'android',
-        channel: VersionChannel.beta,
-        current: current,
+        VersionCheckRequest(
+          appId: 'com.example.app',
+          platform: 'android',
+          channel: VersionChannel.beta,
+          current: current,
+        ),
       );
 
       final uri = seen!.url;
@@ -56,10 +58,12 @@ void main() {
       );
       expect(
         () => client.fetch(
-          appId: 'a',
-          platform: 'ios',
-          channel: VersionChannel.production,
-          current: current,
+          VersionCheckRequest(
+            appId: 'a',
+            platform: 'ios',
+            channel: VersionChannel.production,
+            current: current,
+          ),
         ),
         throwsA(
           isA<VersionApiException>().having(
@@ -78,10 +82,12 @@ void main() {
       );
       expect(
         () => client.fetch(
-          appId: 'a',
-          platform: 'ios',
-          channel: VersionChannel.production,
-          current: current,
+          VersionCheckRequest(
+            appId: 'a',
+            platform: 'ios',
+            channel: VersionChannel.production,
+            current: current,
+          ),
         ),
         throwsA(isA<VersionApiException>()),
       );
@@ -94,10 +100,12 @@ void main() {
       );
       expect(
         () => client.fetch(
-          appId: 'a',
-          platform: 'ios',
-          channel: VersionChannel.production,
-          current: current,
+          VersionCheckRequest(
+            appId: 'a',
+            platform: 'ios',
+            channel: VersionChannel.production,
+            current: current,
+          ),
         ),
         throwsA(isA<VersionResponseException>()),
       );
@@ -118,10 +126,12 @@ void main() {
       );
       expect(
         () => client.fetch(
-          appId: 'a',
-          platform: 'ios',
-          channel: VersionChannel.production,
-          current: current,
+          VersionCheckRequest(
+            appId: 'a',
+            platform: 'ios',
+            channel: VersionChannel.production,
+            current: current,
+          ),
         ),
         throwsA(isA<VersionApiException>()),
       );
@@ -137,10 +147,12 @@ void main() {
       );
       expect(
         () => client.fetch(
-          appId: 'a',
-          platform: 'ios',
-          channel: VersionChannel.production,
-          current: current,
+          VersionCheckRequest(
+            appId: 'a',
+            platform: 'ios',
+            channel: VersionChannel.production,
+            current: current,
+          ),
         ),
         throwsA(
           isA<VersionApiException>().having(
