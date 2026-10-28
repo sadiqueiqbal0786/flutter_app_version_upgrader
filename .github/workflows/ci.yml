@@ -51,7 +51,7 @@ jobs:
         run: |
           flutter create --platforms=android --project-name host_app host_app
           cd host_app
-          flutter pub add 'flutter_app_version_upgrader:{"path":"../plugin"}'
+          flutter pub add flutter_app_version_upgrader --path ../plugin
           cat > lib/main.dart <<'DART'
           import 'package:flutter/material.dart';
           import 'package:flutter_app_version_upgrader/flutter_app_version_upgrader.dart';
