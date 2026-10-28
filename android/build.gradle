@@ -1,0 +1,85 @@
+// Android half of flutter_app_version_upgrader.
+//
+// Written to build inside host apps from Flutter 3.19 (AGP 7.3 / 8.x, Kotlin
+// Gradle plugin applied by the host) up to current Flutter (AGP 9 with
+// built-in Kotlin). The Kotlin Gradle plugin is applied only when the host's
+// AGP does not provide Kotlin itself; applying it on AGP 9 is an error.
+group = "io.github.sadiqueiqbal0786.flutter_app_version_upgrader"
+version = "1.0-SNAPSHOT"
+
+buildscript {
+    ext.kotlin_version = "1.9.24"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.1.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: "com.android.library"
+
+def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+def agpMajor = agpVersion.tokenize(".")[0].toInteger()
+def hostOptedOutOfBuiltInKotlin = (project.findProperty("android.builtInKotlin") ?: "true").toString() == "false"
+def builtInKotlin = agpMajor >= 9 && !hostOptedOutOfBuiltInKotlin
+if (!builtInKotlin) {
+    apply plugin: "kotlin-android"
+}
+
+android {
+    namespace = "io.github.sadiqueiqbal0786.flutter_app_version_upgrader"
+    compileSdk = 34
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+    }
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen { false }
+                showStandardStreams = true
+            }
+        }
+    }
+}
+
+// Kotlin targets JVM 17 on both paths.
+if (builtInKotlin) {
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+} else {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions.jvmTarget = "17"
+    }
+}
+
+dependencies {
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.mockito:mockito-core:5.0.0")
+}

@@ -1,3 +1,10 @@
+## 0.3.2
+
+- Android build file rewritten for host apps on AGP 7.3 / 8.x as well as
+  AGP 9 (built-in Kotlin). Previously the Gradle config assumed AGP 9, so
+  apps on older Flutter templates failed to build. CI now builds a real
+  Flutter 3.19 host app with the plugin.
+
 ## 0.3.1
 
 - Lower the SDK floor to Flutter 3.19 / Dart 3.3 (was Dart 3.13). No

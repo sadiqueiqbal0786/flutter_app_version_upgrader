@@ -51,7 +51,7 @@ launch. No store submission, no app rebuild.
 
 ```yaml
 dependencies:
-  flutter_app_version_upgrader: ^0.3.1
+  flutter_app_version_upgrader: ^0.3.2
 ```
 
 Requirements: Flutter 3.19+ (Dart 3.3+), Android `minSdk 24`, iOS 15.
