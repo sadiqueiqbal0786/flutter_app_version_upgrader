@@ -52,6 +52,9 @@ jobs:
           flutter create --platforms=android --project-name host_app host_app
           cd host_app
           flutter pub add flutter_app_version_upgrader --path ../plugin
+          # The 3.19 template defaults to minSdk 19; real apps set their own.
+          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/; s/minSdk = flutter.minSdkVersion/minSdk = 21/' android/app/build.gradle
+          grep -n "minSdk" android/app/build.gradle
           cat > lib/main.dart <<'DART'
           import 'package:flutter/material.dart';
           import 'package:flutter_app_version_upgrader/flutter_app_version_upgrader.dart';

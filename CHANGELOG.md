@@ -1,5 +1,6 @@
 ## 0.3.2
 
+- Android `minSdk` lowered from 24 to 21.
 - Android build file rewritten for host apps on AGP 7.3 / 8.x as well as
   AGP 9 (built-in Kotlin). Previously the Gradle config assumed AGP 9, so
   apps on older Flutter templates failed to build. CI now builds a real

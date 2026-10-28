@@ -54,7 +54,7 @@ dependencies:
   flutter_app_version_upgrader: ^0.3.2
 ```
 
-Requirements: Flutter 3.19+ (Dart 3.3+), Android `minSdk 24`, iOS 15.
+Requirements: Flutter 3.19+ (Dart 3.3+), Android `minSdk 21`, iOS 15.
 Nothing to add to `AndroidManifest.xml` or `Info.plist`.
 
 ### 2. Initialise once, before `runApp`
@@ -398,7 +398,7 @@ breaks ties within the same version, matching how both stores behave.
 
 | Platform | Support |
 |---|---|
-| Android | Native. Reads `versionName` / `versionCode`, caches in `SharedPreferences`, opens `market://` then the Play web page |
+| Android (minSdk 21) | Native. Reads `versionName` / `versionCode`, caches in `SharedPreferences`, opens `market://` then the Play web page |
 | iOS | Native. Reads `CFBundleShortVersionString` / `CFBundleVersion`, caches in `UserDefaults`, opens the server's URL, else `itms-apps://` for the App Store id |
 | Web, macOS, Windows, Linux | Guarded. No exception is thrown; `check()` fails open. Set `appId` and `currentVersionOverride` to run checks there with an in-memory cache. `openStore` returns `false` |
 
